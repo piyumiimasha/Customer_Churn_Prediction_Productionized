@@ -8,10 +8,10 @@ import pandas as pd
 from sklearn.base import BaseEstimator
 
 # Import existing src modules
-from .feature_engineering import ServicesScoreStrategy, VulnerabilityScoreStrategy
-from .feature_binning import TenureBinningStrategy
-from .handle_missing_values import MeanImputationStrategy, BinaryEncodingStrategy
-from .feature_encoding import NominalEncodingStrategy
+from feature_engineering import ServicesScoreStrategy, VulnerabilityScoreStrategy
+from feature_binning import TenureBinningStrategy
+from handle_missing_values import MeanImputationStrategy, BinaryEncodingStrategy
+from feature_encoding import NominalEncodingStrategy
 
 logging.basicConfig(level=logging.INFO, format=
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
