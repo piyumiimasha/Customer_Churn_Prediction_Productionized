@@ -1,5 +1,5 @@
 
-Steps To Run 
+### Steps To Run 
 1. Create Python UV environment
     - uv venv
     - uv --version to check version
@@ -14,9 +14,10 @@ Steps To Run
     - python pipelines/data_pipeline.py
 
 
-Steps to Access MLflow Interface
+### Steps to Access MLflow Interface
 
 1. Mlflow is already installed with requirements
+
 2. To run Mlflow ui paste following command into terminal 
     - mlflow ui --host 0.0.0.0 --port $(MLFLOW_PORT)
     - UI will be available in localhost:MLFLOW_PORT
