@@ -110,7 +110,8 @@ if __name__ == '__main__':
     try:
         # Get model configuration
         model_config = get_model_config()
-        model_params = model_config.get('model_params', {})
+        # Get CatBoost optimal parameters instead of parameter grid
+        model_params = model_config.get('optimal_params', {}).get('catboost', {})
         
         logger.info("Starting training pipeline with parameters:")
         logger.info(f"Model Parameters: {model_params}")
