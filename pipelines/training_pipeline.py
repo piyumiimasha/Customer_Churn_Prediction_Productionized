@@ -12,8 +12,8 @@ from model_building import CatBoostModelBuilder
 from model_training import ModelTrainer
 from model_evaluation import ModelEvaluator
 
-# from mlflow_utils import MLflowTracker, setup_mlflow_autolog, create_mlflow_run_tags
-# import mlflow
+from mlflow_utils import MLflowTracker, setup_mlflow_autolog, create_mlflow_run_tags
+import mlflow
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 from config import get_data_paths, get_model_config
@@ -43,6 +43,14 @@ def training_pipeline(
         data_pipeline()
     else:
         logger.info("Loading existing data artifacts from data pipeline")
+
+    mlflow_tracker = MLflowTracker()
+    run_tags = create_mlflow_run_tags('training_pipeline', {
+            'model_type': 'XGboost',
+            'training_stratergy': 'simple',
+            'other_models': 'randomforest'
+        })
+    run = mlflow_tracker.start_run(run_name='training_pipeline', tags=run_tags)
     
     # Load training and test data
     logger.info("Loading training and test data")
@@ -84,6 +92,10 @@ def training_pipeline(
         y_test=y_test,
         cv_score=None  # No cross-validation score in this simple pipeline
     )
+    model_params = get_model_config().get('model_params', {})
+    mlflow_tracker.log_training_metrics(model ,evaluation_results, model_params=model_params)
+
+    mlflow_tracker.end_run()
     
     # Get feature importance if available
     if hasattr(X_train, 'columns'):
