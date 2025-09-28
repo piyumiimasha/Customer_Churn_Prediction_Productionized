@@ -93,7 +93,7 @@ class CatBoostModelBuilder(BaseModelBuilder):
         self.model = cb.CatBoostClassifier(**self.model_params)
         return self.model
 
-rf= CatBoostModelBuilder()
-rf_model = rf.build_model()
-print(f"Model created: {rf_model}")
-print(f"Model parameters: {rf_model.get_params()}")
+# rf= CatBoostModelBuilder()
+# rf_model = rf.build_model()
+# print(f"Model created: {rf_model}")
+# print(f"Model parameters: {rf_model.get_params()}")
