@@ -111,6 +111,13 @@ class ModelInference:
             labels = ['New', 'Intermediate', 'Established', 'Loyal']
             tenure_binning = TenureBinningStrategy(bins=bins, labels=labels)
             df = tenure_binning.bin_feature(df, 'tenure')
+            
+            # Convert tenure_group from categorical to numeric (ordinal encoding)
+            if 'tenure_group' in df.columns:
+                tenure_mapping = {'New': 0, 'Intermediate': 1, 'Established': 2, 'Loyal': 3}
+                # Convert to string first, then map, then convert to numeric
+                df['tenure_group'] = df['tenure_group'].astype(str).map(tenure_mapping).astype('int64')
+                logger.info("Applied ordinal encoding to tenure_group")
 
         # Drop features
         features_to_drop = [
@@ -133,7 +140,16 @@ class ModelInference:
                 df[target_col] = df[target_col].fillna(0)
                 df = df.drop(columns=[source_col])
 
-        # 5. Use preprocessor if available
+        # 5. Apply categorical encoding using saved encoders
+        categorical_features = ['Contract', 'InternetService', 'PaymentMethod']
+        for feature in categorical_features:
+            if feature in df.columns and feature in self.encoders:
+                df[feature] = df[feature].map(self.encoders[feature])
+                # Handle unseen categories by setting to most common encoding (0)
+                df[feature] = df[feature].fillna(0)
+                logger.info(f"Applied encoding for {feature}")
+
+        # 6. Use preprocessor if available
         if self.preprocessor is not None:
             # Apply preprocessing
             processed_data = self.preprocessor.transform(df)
