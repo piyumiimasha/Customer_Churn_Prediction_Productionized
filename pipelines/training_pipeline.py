@@ -103,7 +103,40 @@ def training_pipeline(
     # Add train score to metrics
     metrics_to_log['train_score'] = float(train_score)
     
-    model_params = get_model_config().get('model_params', {})
+    # Enhanced MLflow Logging
+    model_config = get_model_config()
+    model_params = model_config.get('model_params', {})
+    
+    # 1. Log model hyperparameters (including all model parameters)
+    mlflow_tracker.log_model_hyperparameters(trained_model, additional_params={
+        'test_size': test_size,
+        'random_state': random_state,
+        'model_type': 'CatBoost',
+        'training_strategy': 'simple'
+    })
+    
+    # 2. Log comprehensive evaluation metrics
+    y_pred = evaluation_results['predictions']
+    y_pred_proba = evaluation_results['probabilities']
+    mlflow_tracker.log_comprehensive_evaluation_metrics(
+        y_test, y_pred, y_pred_proba, model_name='CatBoost'
+    )
+    
+    # 3. Log visualization plots
+    feature_importance = None
+    feature_names = None
+    if hasattr(trained_model, 'feature_importances_') and hasattr(X_train, 'columns'):
+        feature_importance = trained_model.feature_importances_
+        feature_names = X_train.columns.tolist()
+    
+    mlflow_tracker.log_visualization_plots(
+        y_test, y_pred, y_pred_proba,
+        feature_importance=feature_importance,
+        feature_names=feature_names,
+        model_name='CatBoost'
+    )
+    
+    # 4. Log basic training metrics and model (existing functionality)
     mlflow_tracker.log_training_metrics(trained_model, metrics_to_log, model_params=model_params)
 
     mlflow_tracker.end_run()

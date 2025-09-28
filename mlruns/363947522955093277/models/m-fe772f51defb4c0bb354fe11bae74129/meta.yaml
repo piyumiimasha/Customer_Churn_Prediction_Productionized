@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/viraj/Zuu/Customer_Churn_Prediction_Productionized/mlruns/363947522955093277/models/m-fe772f51defb4c0bb354fe11bae74129/artifacts
+creation_timestamp: 1759081591144
+experiment_id: '363947522955093277'
+last_updated_timestamp: 1759081597417
+model_id: m-fe772f51defb4c0bb354fe11bae74129
+model_type: null
+name: model
+source_run_id: 660c3aa5aca44625b0e5e9266ac25709
+status: 2
+status_message: null

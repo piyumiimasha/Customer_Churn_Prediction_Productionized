@@ -7,6 +7,11 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix, classification_report, roc_curve, roc_auc_score
+from sklearn.metrics import precision_recall_curve, average_precision_score
+import json
 
 
 from config import get_mlflow_config
@@ -139,6 +144,295 @@ class MLflowTracker:
             
         except Exception as e:
             logger.error(f"Error logging training metrics: {e}")
+    
+    def log_model_hyperparameters(self, model, additional_params: Optional[Dict[str, Any]] = None):
+        """Log comprehensive model hyperparameters"""
+        try:
+            params_to_log = {}
+            
+            # Extract model parameters
+            if hasattr(model, 'get_params'):
+                model_params = model.get_params()
+                params_to_log.update(model_params)
+            
+            # Add additional parameters if provided
+            if additional_params:
+                params_to_log.update(additional_params)
+            
+            # Filter out non-serializable parameters
+            filtered_params = {}
+            for key, value in params_to_log.items():
+                try:
+                    # Convert numpy types to Python types
+                    if isinstance(value, np.integer):
+                        filtered_params[key] = int(value)
+                    elif isinstance(value, np.floating):
+                        filtered_params[key] = float(value)
+                    elif isinstance(value, (str, int, float, bool, type(None))):
+                        filtered_params[key] = value
+                    else:
+                        filtered_params[key] = str(value)
+                except Exception:
+                    filtered_params[key] = str(value)
+            
+            mlflow.log_params(filtered_params)
+            logger.info(f"Logged {len(filtered_params)} hyperparameters to MLflow")
+            
+        except Exception as e:
+            logger.error(f"Error logging hyperparameters: {e}")
+    
+    def log_comprehensive_evaluation_metrics(self, y_true, y_pred, y_pred_proba=None, 
+                                           model_name: str = "model"):
+        """Log comprehensive evaluation metrics"""
+        try:
+            from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
+                                       f1_score, roc_auc_score, average_precision_score)
+            
+            # Handle string labels for metrics that support pos_label
+            pos_label = 'Yes' if 'Yes' in y_true else 1
+            
+            # Basic classification metrics
+            metrics = {
+                'accuracy': float(accuracy_score(y_true, y_pred)),
+                'precision': float(precision_score(y_true, y_pred, average='weighted')),
+                'recall': float(recall_score(y_true, y_pred, average='weighted')),
+                'f1_score': float(f1_score(y_true, y_pred, average='weighted')),
+                'precision_macro': float(precision_score(y_true, y_pred, average='macro')),
+                'recall_macro': float(recall_score(y_true, y_pred, average='macro')),
+                'f1_score_macro': float(f1_score(y_true, y_pred, average='macro'))
+            }
+            
+            # Add probability-based metrics if available
+            if y_pred_proba is not None:
+                # Convert string labels to binary for probability metrics if needed
+                if isinstance(y_true.iloc[0] if hasattr(y_true, 'iloc') else y_true[0], str):
+                    y_true_binary = (y_true == pos_label).astype(int)
+                    metrics.update({
+                        'roc_auc': float(roc_auc_score(y_true_binary, y_pred_proba)),
+                        'avg_precision_score': float(average_precision_score(y_true_binary, y_pred_proba))
+                    })
+                else:
+                    metrics.update({
+                        'roc_auc': float(roc_auc_score(y_true, y_pred_proba)),
+                        'avg_precision_score': float(average_precision_score(y_true, y_pred_proba))
+                    })
+            
+            # Class distribution
+            unique, counts = np.unique(y_true, return_counts=True)
+            for cls, count in zip(unique, counts):
+                metrics[f'true_class_{cls}_count'] = int(count)
+                metrics[f'true_class_{cls}_percentage'] = float(count / len(y_true) * 100)
+            
+            unique_pred, counts_pred = np.unique(y_pred, return_counts=True)
+            for cls, count in zip(unique_pred, counts_pred):
+                metrics[f'pred_class_{cls}_count'] = int(count)
+                metrics[f'pred_class_{cls}_percentage'] = float(count / len(y_pred) * 100)
+            
+            mlflow.log_metrics(metrics)
+            
+            # Log classification report as text artifact
+            report = classification_report(y_true, y_pred, output_dict=True)
+            report_path = f"artifacts/classification_report_{model_name}.json"
+            os.makedirs("artifacts", exist_ok=True)
+            
+            with open(report_path, 'w') as f:
+                json.dump(report, f, indent=2, default=str)
+            
+            mlflow.log_artifact(report_path, "evaluation")
+            
+            logger.info(f"Logged {len(metrics)} comprehensive evaluation metrics to MLflow")
+            
+        except Exception as e:
+            logger.error(f"Error logging comprehensive evaluation metrics: {e}")
+    
+    def log_visualization_plots(self, y_true, y_pred, y_pred_proba=None, 
+                              feature_importance=None, feature_names=None,
+                              model_name: str = "model"):
+        """Generate and log visualization plots"""
+        try:
+            plots_dir = "artifacts/plots"
+            os.makedirs(plots_dir, exist_ok=True)
+            
+            # Set style for better-looking plots
+            plt.style.use('default')
+            sns.set_palette("husl")
+            
+            # 1. Confusion Matrix
+            self._create_confusion_matrix_plot(y_true, y_pred, plots_dir, model_name)
+            
+            # 2. ROC Curve (if probabilities available)
+            if y_pred_proba is not None:
+                self._create_roc_curve_plot(y_true, y_pred_proba, plots_dir, model_name)
+                
+                # 3. Precision-Recall Curve
+                self._create_precision_recall_curve_plot(y_true, y_pred_proba, plots_dir, model_name)
+                
+                # 4. Prediction Distribution
+                self._create_prediction_distribution_plot(y_pred_proba, plots_dir, model_name)
+            
+            # 5. Feature Importance (if available)
+            if feature_importance is not None and feature_names is not None:
+                self._create_feature_importance_plot(feature_importance, feature_names, 
+                                                   plots_dir, model_name)
+            
+            # 6. Model Performance Summary
+            self._create_performance_summary_plot(y_true, y_pred, y_pred_proba, 
+                                                plots_dir, model_name)
+            
+            # Log all plots as artifacts
+            for plot_file in os.listdir(plots_dir):
+                if plot_file.endswith('.png'):
+                    mlflow.log_artifact(os.path.join(plots_dir, plot_file), "visualizations")
+            
+            logger.info("Logged visualization plots to MLflow")
+            
+        except Exception as e:
+            logger.error(f"Error logging visualization plots: {e}")
+    
+    def _create_confusion_matrix_plot(self, y_true, y_pred, plots_dir, model_name):
+        """Create confusion matrix heatmap"""
+        plt.figure(figsize=(8, 6))
+        cm = confusion_matrix(y_true, y_pred)
+        
+        # Determine labels based on the data
+        if isinstance(y_true.iloc[0] if hasattr(y_true, 'iloc') else y_true[0], str):
+            labels = ['No Churn', 'Churn'] if 'Yes' in y_true else list(np.unique(y_true))
+        else:
+            labels = ['No Churn', 'Churn']
+        
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+                   xticklabels=labels, 
+                   yticklabels=labels)
+        plt.title(f'Confusion Matrix - {model_name}')
+        plt.ylabel('True Label')
+        plt.xlabel('Predicted Label')
+        plt.tight_layout()
+        plt.savefig(f'{plots_dir}/confusion_matrix_{model_name}.png', dpi=300, bbox_inches='tight')
+        plt.close()
+    
+    def _create_roc_curve_plot(self, y_true, y_pred_proba, plots_dir, model_name):
+        """Create ROC curve plot"""
+        # Handle string labels by specifying pos_label
+        pos_label = 'Yes' if 'Yes' in y_true else 1
+        fpr, tpr, _ = roc_curve(y_true, y_pred_proba, pos_label=pos_label)
+        auc_score = roc_auc_score(y_true, y_pred_proba)
+        
+        plt.figure(figsize=(8, 6))
+        plt.plot(fpr, tpr, color='darkorange', lw=2, 
+                label=f'{model_name} (AUC = {auc_score:.3f})')
+        plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title(f'ROC Curve - {model_name}')
+        plt.legend(loc="lower right")
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(f'{plots_dir}/roc_curve_{model_name}.png', dpi=300, bbox_inches='tight')
+        plt.close()
+    
+    def _create_precision_recall_curve_plot(self, y_true, y_pred_proba, plots_dir, model_name):
+        """Create Precision-Recall curve plot"""
+        # Handle string labels by specifying pos_label
+        pos_label = 'Yes' if 'Yes' in y_true else 1
+        precision, recall, _ = precision_recall_curve(y_true, y_pred_proba, pos_label=pos_label)
+        avg_precision = average_precision_score(y_true, y_pred_proba, pos_label=pos_label)
+        
+        plt.figure(figsize=(8, 6))
+        plt.plot(recall, precision, color='darkorange', lw=2,
+                label=f'{model_name} (AP = {avg_precision:.3f})')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('Recall')
+        plt.ylabel('Precision')
+        plt.title(f'Precision-Recall Curve - {model_name}')
+        plt.legend(loc="lower left")
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(f'{plots_dir}/precision_recall_curve_{model_name}.png', dpi=300, bbox_inches='tight')
+        plt.close()
+    
+    def _create_prediction_distribution_plot(self, y_pred_proba, plots_dir, model_name):
+        """Create prediction probability distribution plot"""
+        plt.figure(figsize=(10, 6))
+        plt.hist(y_pred_proba, bins=50, alpha=0.7, color='skyblue', edgecolor='black')
+        plt.axvline(x=0.5, color='red', linestyle='--', label='Decision Threshold (0.5)')
+        plt.xlabel('Predicted Churn Probability')
+        plt.ylabel('Frequency')
+        plt.title(f'Prediction Probability Distribution - {model_name}')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(f'{plots_dir}/prediction_distribution_{model_name}.png', dpi=300, bbox_inches='tight')
+        plt.close()
+    
+    def _create_feature_importance_plot(self, feature_importance, feature_names, plots_dir, model_name):
+        """Create feature importance plot"""
+        # Get top 15 features
+        top_n = min(15, len(feature_importance))
+        indices = np.argsort(feature_importance)[-top_n:]
+        
+        plt.figure(figsize=(10, 8))
+        plt.barh(range(len(indices)), feature_importance[indices], alpha=0.7)
+        plt.yticks(range(len(indices)), [feature_names[i] for i in indices])
+        plt.xlabel('Feature Importance')
+        plt.title(f'Top {top_n} Feature Importances - {model_name}')
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(f'{plots_dir}/feature_importance_{model_name}.png', dpi=300, bbox_inches='tight')
+        plt.close()
+    
+    def _create_performance_summary_plot(self, y_true, y_pred, y_pred_proba, plots_dir, model_name):
+        """Create a comprehensive performance summary plot"""
+        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+        
+        # Confusion Matrix
+        cm = confusion_matrix(y_true, y_pred)
+        # Determine labels based on the data
+        if isinstance(y_true.iloc[0] if hasattr(y_true, 'iloc') else y_true[0], str):
+            labels = ['No Churn', 'Churn'] if 'Yes' in y_true else list(np.unique(y_true))
+        else:
+            labels = ['No Churn', 'Churn']
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=axes[0,0],
+                   xticklabels=labels, 
+                   yticklabels=labels)
+        axes[0,0].set_title('Confusion Matrix')
+        
+        # Class Distribution
+        unique, counts = np.unique(y_true, return_counts=True)
+        class_labels = ['No Churn', 'Churn'] if len(unique) == 2 else [str(u) for u in unique]
+        axes[0,1].bar(class_labels, counts, alpha=0.7, color=['skyblue', 'orange'])
+        axes[0,1].set_title('True Class Distribution')
+        axes[0,1].set_ylabel('Count')
+        
+        # ROC Curve
+        if y_pred_proba is not None:
+            # Handle string labels
+            pos_label = 'Yes' if 'Yes' in y_true else 1
+            fpr, tpr, _ = roc_curve(y_true, y_pred_proba, pos_label=pos_label)
+            auc_score = roc_auc_score(y_true, y_pred_proba)
+            axes[1,0].plot(fpr, tpr, color='darkorange', lw=2, 
+                          label=f'AUC = {auc_score:.3f}')
+            axes[1,0].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+            axes[1,0].set_xlabel('False Positive Rate')
+            axes[1,0].set_ylabel('True Positive Rate')
+            axes[1,0].set_title('ROC Curve')
+            axes[1,0].legend()
+            axes[1,0].grid(True, alpha=0.3)
+            
+            # Prediction Distribution
+            axes[1,1].hist(y_pred_proba, bins=30, alpha=0.7, color='skyblue', edgecolor='black')
+            axes[1,1].axvline(x=0.5, color='red', linestyle='--', label='Threshold')
+            axes[1,1].set_xlabel('Predicted Probability')
+            axes[1,1].set_ylabel('Frequency')
+            axes[1,1].set_title('Prediction Distribution')
+            axes[1,1].legend()
+        
+        plt.suptitle(f'Model Performance Summary - {model_name}', fontsize=16)
+        plt.tight_layout()
+        plt.savefig(f'{plots_dir}/performance_summary_{model_name}.png', dpi=300, bbox_inches='tight')
+        plt.close()
     
     def log_evaluation_metrics(self, evaluation_metrics: Dict[str, Any], confusion_matrix_path: Optional[str] = None):
         """Log evaluation metrics and artifacts"""
