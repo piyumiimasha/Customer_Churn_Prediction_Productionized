@@ -1,0 +1,9 @@
+digest: a3da5067
+name: dataset
+profile: '{"features_shape": [1509, 10], "features_size": 15090, "features_nbytes":
+  120720}'
+schema: '{"mlflow_tensorspec": {"features": "[{\"type\": \"tensor\", \"tensor-spec\":
+  {\"dtype\": \"float64\", \"shape\": [-1, 10]}}]", "targets": null}}'
+source: '{"tags": {"mlflow.user": "viraj", "mlflow.source.name": "pipelines/data_pipeline.py",
+  "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "da6eba29e6c97e6e386a78094922f1c46e667be4"}}'
+source_type: code

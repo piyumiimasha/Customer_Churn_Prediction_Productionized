@@ -1,0 +1,1 @@
+['InternetService', 'Contract', 'PaymentMethod', 'MonthlyCharges', 'TotalCharges', 'OnlineSecurity_numeric', 'TechSupport_numeric', 'Services_Score', 'Vulnerability_Score', 'tenure_group']

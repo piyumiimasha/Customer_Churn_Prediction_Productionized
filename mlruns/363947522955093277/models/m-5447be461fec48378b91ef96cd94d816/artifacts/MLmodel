@@ -1,0 +1,14 @@
+artifact_path: file:///C:/Users/viraj/Zuu/Customer_Churn_Prediction_Productionized/mlruns/363947522955093277/models/m-5447be461fec48378b91ef96cd94d816/artifacts
+flavors:
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+mlflow_version: 3.4.0
+model_id: m-5447be461fec48378b91ef96cd94d816
+model_size_bytes: 145884
+model_uuid: m-5447be461fec48378b91ef96cd94d816
+prompts: null
+run_id: 9be52026fb464132a6132f4100d9990e
+utc_time_created: '2025-09-28 17:09:42.415163'
