@@ -70,7 +70,7 @@ class ModelInference:
         # Create a copy to avoid modifying original data
         df = data.copy()
         
-        # 1. Handle TotalCharges conversion and missing values using existing strategy
+        # 1. Handle TotalCharges conversion and missing values 
         if 'TotalCharges' in df.columns:
             df['TotalCharges'] = df['TotalCharges'].replace(' ', np.nan)
             df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
@@ -79,19 +79,19 @@ class ModelInference:
             mean_imputer = MeanImputationStrategy(['TotalCharges'])
             df = mean_imputer.handle(df)
 
-        # Convert SeniorCitizen to string format (same as notebook)
+        # Convert SeniorCitizen to string format
         if 'SeniorCitizen' in df.columns:
             df['SeniorCitizen'] = df['SeniorCitizen'].apply(
-                lambda x: "yes" if x == 1 else "No"
+                lambda x: "yes" if x == 1 else "no"
             )
 
-        # 2. Create engineered features using existing strategies
-        # Services Score using ServicesScoreStrategy
+        # 2. Create engineered features 
+        # Services Score 
         support_services = ['OnlineBackup', 'DeviceProtection', 'OnlineSecurity', 'TechSupport']
         services_strategy = ServicesScoreStrategy(support_services)
         df = services_strategy.engineer_feature(df)
 
-        # Vulnerability Score using VulnerabilityScoreStrategy
+        # Vulnerability Score 
         vulnerability_weights = {
             'senior_citizen': 2,
             'no_partner': 1,
@@ -105,14 +105,14 @@ class ModelInference:
         )
         df = vulnerability_strategy.engineer_feature(df)
 
-        # 3. Tenure binning using TenureBinningStrategy
+        # 3. Tenure binning 
         if 'tenure' in df.columns:
             bins = [0, 12, 24, 48, 72]
             labels = ['New', 'Intermediate', 'Established', 'Loyal']
             tenure_binning = TenureBinningStrategy(bins=bins, labels=labels)
             df = tenure_binning.bin_feature(df, 'tenure')
 
-        # Drop features as per notebook analysis
+        # Drop features
         features_to_drop = [
             'customerID', 'gender', 'SeniorCitizen', 'Partner', 'Dependents',
             'PhoneService', 'MultipleLines', 'OnlineBackup', 'DeviceProtection',
@@ -120,7 +120,7 @@ class ModelInference:
         ]
         df = df.drop(columns=[col for col in features_to_drop if col in df.columns])
 
-        # 4. Handle binary encoding using BinaryEncodingStrategy
+        # 4. Handle binary encoding
         binary_columns = {
             'OnlineSecurity': 'OnlineSecurity_numeric',
             'TechSupport': 'TechSupport_numeric'
