@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/viraj/Zuu/Customer_Churn_Prediction_Productionized/mlruns/363947522955093277/8db1ba551fc34f5ca5b9e92c12158193/artifacts
+end_time: 1759080460456
+entry_point_name: ''
+experiment_id: '363947522955093277'
+lifecycle_stage: active
+run_id: 8db1ba551fc34f5ca5b9e92c12158193
+run_name: training pipeline | 2025-09-28 22:57:38
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1759080458632
+status: 3
+tags: []
+user_id: viraj
