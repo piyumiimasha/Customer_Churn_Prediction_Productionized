@@ -17,4 +17,8 @@ Steps To Run
 Steps to Access MLflow Interface
 
 1. Mlflow is already installed with requirements
+2. To run Mlflow ui paste following command into terminal 
+    - mlflow ui --host 0.0.0.0 --port $(MLFLOW_PORT)
+    - UI will be available in localhost:MLFLOW_PORT
+    - open another terminal and run the pipeline to see the result in UI
 
