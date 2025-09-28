@@ -108,8 +108,24 @@ class MLflowTracker:
             # Log model parameters
             mlflow.log_params(model_params)
             
-            # Log training metrics
-            mlflow.log_metrics(training_metrics)
+            # Filter and log only scalar metrics
+            scalar_metrics = {}
+            for key, value in training_metrics.items():
+                if value is not None:
+                    try:
+                        # Convert to float if possible
+                        if isinstance(value, (int, float, np.integer, np.floating)):
+                            scalar_metrics[key] = float(value)
+                        elif isinstance(value, np.ndarray) and value.ndim == 0:
+                            scalar_metrics[key] = float(value.item())
+                        else:
+                            logger.warning(f"Skipping non-scalar metric '{key}' with type {type(value)}")
+                    except (ValueError, TypeError) as e:
+                        logger.warning(f"Could not convert metric '{key}' to float: {e}")
+            
+            # Log the filtered metrics
+            if scalar_metrics:
+                mlflow.log_metrics(scalar_metrics)
             
             # Log the model
             artifact_path = self.config.get('artifact_path', 'model')

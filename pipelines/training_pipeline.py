@@ -92,8 +92,19 @@ def training_pipeline(
         y_test=y_test,
         cv_score=None  # No cross-validation score in this simple pipeline
     )
+    
+    # Prepare metrics for MLflow (filter out non-scalar values)
+    metrics_to_log = {}
+    for key, value in evaluation_results.items():
+        if key in ['cv_auc', 'test_auc', 'overfitting'] and value is not None:
+            if np.isscalar(value) or (isinstance(value, np.ndarray) and value.ndim == 0):
+                metrics_to_log[key] = float(value)
+    
+    # Add train score to metrics
+    metrics_to_log['train_score'] = float(train_score)
+    
     model_params = get_model_config().get('model_params', {})
-    mlflow_tracker.log_training_metrics(model ,evaluation_results, model_params=model_params)
+    mlflow_tracker.log_training_metrics(trained_model, metrics_to_log, model_params=model_params)
 
     mlflow_tracker.end_run()
     
