@@ -191,3 +191,16 @@ evaluation:
 logging:
   level: "INFO"
   format: "%(asctime)s - %(levelname)s - %(message)s"
+
+mlflow:
+  tracking_uri: "file:./mlruns"
+  experiment_name: "churn_prediction_experiment"
+  run_name_prefix: "churn_prediction_run"
+  artifact_path: "model"
+  model_registry_name: "churn_prediction_model"
+  autolog: true
+  tags:
+    project: "customer_churn_prediction"
+    team: "data_science"
+    environment: "development"
+    version: "1.0.0"

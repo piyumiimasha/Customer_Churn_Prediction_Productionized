@@ -164,6 +164,15 @@ def get_model_config() -> Dict[str, Any]:
     """
     return config.get('model_training', {})
 
+def get_mlflow_config() -> Dict[str, Any]:
+    """
+    Get MLflow configuration
+    
+    Returns:
+        Dictionary with MLflow configuration
+    """
+    return config.get('mlflow', {})
+
 # Example usage:
 if __name__ == "__main__":
     # Load configuration
