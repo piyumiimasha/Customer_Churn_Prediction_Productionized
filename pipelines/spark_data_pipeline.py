@@ -146,6 +146,123 @@ class SparkDataPipeline:
             logger.error(f"✗ Error loading data: {str(e)}")
             raise
     
+    def clean_totalcharges_column(self, df: DataFrame) -> DataFrame:
+        """
+        Clean TotalCharges column to prevent feature explosion
+        
+        The TotalCharges column often contains string values like '29.85', '1889.5', etc.
+        This causes Spark to treat it as categorical with thousands of unique values,
+        leading to feature explosion during one-hot encoding.
+        
+        Args:
+            df: Input DataFrame
+            
+        Returns:
+            DataFrame: DataFrame with cleaned TotalCharges column
+        """
+        try:
+            if 'TotalCharges' not in df.columns:
+                logger.info("📋 TotalCharges column not found, skipping cleaning")
+                return df
+            
+            logger.info("🧹 Cleaning TotalCharges column...")
+            
+            # Check current data type and unique values
+            totalcharges_type = dict(df.dtypes)['TotalCharges']
+            unique_count = df.select('TotalCharges').distinct().count()
+            
+            logger.info(f"  • Current type: {totalcharges_type}")
+            logger.info(f"  • Unique values: {unique_count:,}")
+            
+            if totalcharges_type == 'string':
+                # Show some sample values
+                sample_values = df.select('TotalCharges').limit(5).collect()
+                logger.info(f"  • Sample values: {[row['TotalCharges'] for row in sample_values]}")
+                
+                # Clean and convert TotalCharges to numeric
+                df_cleaned = df.withColumn(
+                    'TotalCharges',
+                    when(
+                        (col('TotalCharges').isNull()) | 
+                        (col('TotalCharges') == '') | 
+                        (col('TotalCharges') == ' ') |
+                        (col('TotalCharges').rlike(r'^\s*$')),  # Only whitespace
+                        0.0  # Replace empty/null values with 0
+                    ).otherwise(
+                        col('TotalCharges').cast('double')  # Convert to numeric
+                    )
+                )
+                
+                # Verify the conversion
+                new_type = dict(df_cleaned.dtypes)['TotalCharges']
+                new_unique_count = df_cleaned.select('TotalCharges').distinct().count()
+                
+                logger.info(f"  ✓ Converted to type: {new_type}")
+                logger.info(f"  ✓ New unique values: {new_unique_count:,}")
+                logger.info(f"  ✓ Reduced from {unique_count:,} to {new_unique_count:,} unique values!")
+                
+                # Show statistics
+                stats = df_cleaned.select('TotalCharges').summary()
+                logger.info("  ✓ TotalCharges statistics after cleaning:")
+                stats.show()
+                
+                return df_cleaned
+            else:
+                logger.info(f"  • TotalCharges is already numeric ({totalcharges_type}), no cleaning needed")
+                return df
+                
+        except Exception as e:
+            logger.error(f"✗ Error cleaning TotalCharges column: {str(e)}")
+            # Return original DataFrame if cleaning fails
+            return df
+
+    def clean_monthlycharges_column(self, df: DataFrame) -> DataFrame:
+        """
+        Ensure MonthlyCharges column is properly typed as numeric.
+        
+        MonthlyCharges has 1,585 unique values and might be treated as categorical
+        by Spark if not properly typed. This ensures it's treated as numerical.
+        
+        Args:
+            df: Spark DataFrame with MonthlyCharges column
+            
+        Returns:
+            DataFrame with MonthlyCharges as double type
+        """
+        try:
+            if 'MonthlyCharges' not in df.columns:
+                logger.info("📋 MonthlyCharges column not found, skipping cleaning")
+                return df
+                
+            logger.info("🔧 Ensuring MonthlyCharges is numerical (preventing feature explosion)")
+            
+            # Check current data type
+            current_type = dict(df.dtypes).get('MonthlyCharges', 'unknown')
+            unique_count = df.select('MonthlyCharges').distinct().count()
+            
+            logger.info(f"  • Current type: {current_type}")
+            logger.info(f"  • Unique values: {unique_count:,}")
+            
+            # Ensure it's double type (not string)
+            if current_type != 'double':
+                df_cleaned = df.withColumn('MonthlyCharges', col('MonthlyCharges').cast('double'))
+                new_type = dict(df_cleaned.dtypes).get('MonthlyCharges', 'unknown')
+                logger.info(f"  ✓ Converted from {current_type} to {new_type}")
+            else:
+                df_cleaned = df
+                logger.info(f"  ✓ Already proper numeric type: {current_type}")
+            
+            # Show basic statistics
+            logger.info("  ✓ MonthlyCharges statistics:")
+            df_cleaned.select('MonthlyCharges').summary().show()
+            
+            logger.info("✅ MonthlyCharges confirmed as numerical type")
+            return df_cleaned
+            
+        except Exception as e:
+            logger.error(f"❌ Error cleaning MonthlyCharges column: {str(e)}")
+            return df
+    
     def analyze_data_quality(self, df: DataFrame) -> Dict[str, Any]:
         """
         Analyze data quality using Spark operations
@@ -493,12 +610,16 @@ class SparkDataPipeline:
         try:
             logger.info("🔨 Creating preprocessing pipeline...")
             
-            # Identify column types
+            # Identify column types (exclude ID columns and target)
             self.categorical_columns = []
             self.numerical_columns = []
             
+            # Define columns to exclude from features
+            exclude_columns = {self.target_column, 'customerID'}
+            logger.info(f"🚫 Excluding columns from features: {exclude_columns}")
+            
             for col_name, col_type in df.dtypes:
-                if col_name == self.target_column:
+                if col_name in exclude_columns:
                     continue
                     
                 if col_type == 'string':
@@ -507,8 +628,25 @@ class SparkDataPipeline:
                     self.numerical_columns.append(col_name)
             
             logger.info(f"📊 Column analysis:")
-            logger.info(f"  • Categorical: {len(self.categorical_columns)} columns")
-            logger.info(f"  • Numerical: {len(self.numerical_columns)} columns")
+            logger.info(f"  • Categorical: {len(self.categorical_columns)} columns - {self.categorical_columns}")
+            logger.info(f"  • Numerical: {len(self.numerical_columns)} columns - {self.numerical_columns}")
+            
+            # Check for potential feature explosion issues
+            logger.info("🔍 Checking for high-cardinality columns:")
+            total_expected_features = 0
+            for col_name in self.categorical_columns:
+                unique_count = df.select(col_name).distinct().count()
+                total_expected_features += unique_count
+                if unique_count > 50:
+                    logger.warning(f"  ⚠️  {col_name}: {unique_count:,} unique values (HIGH CARDINALITY!)")
+                else:
+                    logger.info(f"  ✓ {col_name}: {unique_count} unique values")
+            
+            total_expected_features += len(self.numerical_columns)  # Numerical columns = 1 feature each
+            logger.info(f"📈 Expected total features after OneHotEncoding: ~{total_expected_features:,}")
+            
+            if total_expected_features > 1000:
+                logger.warning("⚠️  HIGH FEATURE COUNT DETECTED! Consider feature reduction techniques.")
             
             stages = []
             
@@ -648,6 +786,10 @@ class SparkDataPipeline:
             # 1. Load data
             df = self.load_data(data_path)
             
+            # 1.5. Clean high-cardinality columns (convert to numeric to prevent feature explosion)
+            df = self.clean_totalcharges_column(df)
+            df = self.clean_monthlycharges_column(df)
+            
             # 2. Data quality analysis
             quality_report = self.analyze_data_quality(df)
             
@@ -670,24 +812,43 @@ class SparkDataPipeline:
             # 7. Split data
             train_df, test_df = self.split_data(df_processed)
             
-            # 8. Save processed data
+            # 8. Save processed data (Windows-compatible approach)
             logger.info("💾 Saving processed data...")
             
-            # Save as CSV format (Windows-compatible alternative to Parquet)
-            logger.info("💾 Saving train data as CSV...")
-            train_df.select("features", "label").coalesce(1).write.mode("overwrite").option("header", "true").csv(
-                f"{output_dir}/train_data_csv"
-            )
+            # Convert to pandas and save using pandas (avoids Hadoop dependency issues)
+            logger.info("💾 Converting train data to pandas for Windows-compatible saving...")
+            train_pandas = train_df.select("features", "label").toPandas()
             
-            logger.info("💾 Saving test data as CSV...")
-            test_df.select("features", "label").coalesce(1).write.mode("overwrite").option("header", "true").csv(
-                f"{output_dir}/test_data_csv"
-            )
+            # Convert vector features to array format for pandas
+            from pyspark.ml.linalg import VectorUDT
+            features_array = []
+            labels_array = []
             
-            logger.info("✅ Data saved successfully in CSV format")
+            for row in train_df.select("features", "label").collect():
+                features_array.append(row['features'].toArray())
+                labels_array.append(row['label'])
             
-            # Note: Parquet format disabled due to Windows Hadoop compatibility issues
-            # To enable Parquet: install winutils.exe and set HADOOP_HOME
+            # Create artifacts directory if it doesn't exist
+            os.makedirs(f"{output_dir}", exist_ok=True)
+            
+            # Save as numpy arrays (much more efficient and Windows-compatible)
+            np.save(f"{output_dir}/X_train.npy", np.array(features_array))
+            np.save(f"{output_dir}/y_train.npy", np.array(labels_array))
+            
+            logger.info("💾 Converting test data to pandas for Windows-compatible saving...")
+            test_features_array = []
+            test_labels_array = []
+            
+            for row in test_df.select("features", "label").collect():
+                test_features_array.append(row['features'].toArray())
+                test_labels_array.append(row['label'])
+            
+            np.save(f"{output_dir}/X_test.npy", np.array(test_features_array))
+            np.save(f"{output_dir}/y_test.npy", np.array(test_labels_array))
+            
+            logger.info("✅ Data saved successfully in NumPy format (Windows-compatible)")
+            logger.info(f"  • Training features: {len(features_array)} samples x {len(features_array[0])} features")
+            logger.info(f"  • Test features: {len(test_features_array)} samples x {len(test_features_array[0])} features")
             
             # Save pipeline model (commented out for Windows compatibility)
             # fitted_pipeline.write().overwrite().save(f"{output_dir}/preprocessing_pipeline")
@@ -695,14 +856,16 @@ class SparkDataPipeline:
             # Prepare results
             results = {
                 'data_quality': quality_report,
-                'train_count': train_df.count(),
-                'test_count': test_df.count(),
+                'train_count': len(features_array),
+                'test_count': len(test_features_array),
                 'feature_columns': self.feature_columns,
                 'categorical_columns': self.categorical_columns,
                 'numerical_columns': self.numerical_columns,
-                'pipeline_path': f"{output_dir}/preprocessing_pipeline",
-                'train_data_path': f"{output_dir}/train_data.parquet",
-                'test_data_path': f"{output_dir}/test_data.parquet"
+                'train_features_path': f"{output_dir}/X_train.npy",
+                'train_labels_path': f"{output_dir}/y_train.npy",
+                'test_features_path': f"{output_dir}/X_test.npy",
+                'test_labels_path': f"{output_dir}/y_test.npy",
+                'feature_count': len(features_array[0]) if features_array else 0
             }
             
             logger.info("✅ Complete Spark data pipeline finished successfully!")
@@ -800,16 +963,6 @@ def main():
         try:
             logger.info("\n🤖 Initializing MLlib Model Training...")
             model_trainer = SparkModelTrainer(spark=pipeline.spark)
-            
-            # Note: For full MLlib training, use Parquet format with proper vector features
-            logger.info("📋 MLlib Training Capabilities:")
-            logger.info("   • Logistic Regression with elastic net regularization")
-            logger.info("   • Random Forest with 100+ trees and optimized parameters")
-            logger.info("   • Gradient Boosted Trees (Spark's equivalent to XGBoost)")
-            logger.info("   • Distributed Cross-Validation with parallel execution")
-            logger.info("   • Automated hyperparameter tuning")
-            logger.info("   • Comprehensive model evaluation and comparison")
-            logger.info("   • MLflow experiment tracking and model versioning")
             
             # Performance benchmark
             logger.info("\n⚡ Running Spark operations performance benchmark...")

@@ -27,6 +27,7 @@ from pyspark.mllib.evaluation import BinaryClassificationMetrics
 from pyspark.ml.param.shared import *
 
 # Custom imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 from spark_session import create_spark_session, configure_spark_for_ml
 from spark_data_pipeline import SparkDataPipeline
 
@@ -86,13 +87,26 @@ class SparkModelTrainer:
         Args:
             train_path: Path to training data
             test_path: Path to test data
-            format: Data format ("parquet", "csv", or "auto" for automatic detection)
+            format: Data format ("parquet", "csv", "numpy", or "auto" for automatic detection)
             
         Returns:
             Tuple[DataFrame, DataFrame]: Train and test DataFrames
         """
         try:
             logger.info("📖 Loading processed data...")
+            
+            # Check for NumPy files first (Windows-compatible format)
+            import os
+            data_dir = os.path.dirname(train_path) if os.path.dirname(train_path) else "artifacts/spark_data"
+            
+            numpy_train_features = os.path.join(data_dir, "X_train.npy")
+            numpy_train_labels = os.path.join(data_dir, "y_train.npy")
+            numpy_test_features = os.path.join(data_dir, "X_test.npy")
+            numpy_test_labels = os.path.join(data_dir, "y_test.npy")
+            
+            if all(os.path.exists(f) for f in [numpy_train_features, numpy_train_labels, numpy_test_features, numpy_test_labels]):
+                logger.info("   • Loading from NumPy format (Windows-compatible)")
+                return self._load_numpy_data(numpy_train_features, numpy_train_labels, numpy_test_features, numpy_test_labels)
             
             # Auto-detect format if needed
             if format == "auto":
@@ -143,6 +157,109 @@ class SparkModelTrainer:
             
         except Exception as e:
             logger.error(f"✗ Error loading processed data: {str(e)}")
+            raise
+    
+    def _load_numpy_data(self, train_features_path: str, train_labels_path: str, 
+                        test_features_path: str, test_labels_path: str) -> Tuple[DataFrame, DataFrame]:
+        """
+        Load NumPy arrays and convert to Spark DataFrames with proper vector features
+        
+        Args:
+            train_features_path: Path to training features (.npy)
+            train_labels_path: Path to training labels (.npy)
+            test_features_path: Path to test features (.npy)  
+            test_labels_path: Path to test labels (.npy)
+            
+        Returns:
+            Tuple[DataFrame, DataFrame]: Train and test DataFrames with vector features
+        """
+        try:
+            import numpy as np
+            from pyspark.ml.linalg import Vectors, VectorUDT
+            from pyspark.sql.types import StructType, StructField, DoubleType
+            
+            logger.info("   • Loading NumPy arrays...")
+            
+            # Load NumPy arrays
+            X_train = np.load(train_features_path)
+            y_train = np.load(train_labels_path)
+            X_test = np.load(test_features_path)
+            y_test = np.load(test_labels_path)
+            
+            logger.info(f"   • Training data: {X_train.shape[0]:,} samples x {X_train.shape[1]} features")
+            logger.info(f"   • Test data: {X_test.shape[0]:,} samples x {X_test.shape[1]} features")
+            
+            logger.info("   • Converting to Spark DataFrames (this may take a moment for large datasets)...")
+            
+            # Define schema
+            schema = StructType([
+                StructField("features", VectorUDT(), False),
+                StructField("label", DoubleType(), False)
+            ])
+            
+            # Process in smaller batches to avoid memory issues
+            batch_size = 1000  # Process 1000 rows at a time
+            
+            logger.info(f"   • Processing training data in batches of {batch_size}...")
+            train_dfs = []
+            for i in range(0, len(X_train), batch_size):
+                end_idx = i + batch_size if i + batch_size < len(X_train) else len(X_train)
+                batch_rows = []
+                
+                for j in range(i, end_idx):
+                    features_vector = Vectors.dense(X_train[j].astype(float))
+                    batch_rows.append((features_vector, float(y_train[j])))
+                
+                batch_df = self.spark.createDataFrame(batch_rows, schema)
+                train_dfs.append(batch_df)
+                
+                if (i // batch_size + 1) % 5 == 0:  # Log progress every 5 batches
+                    logger.info(f"     • Processed {end_idx:,}/{len(X_train):,} training samples...")
+            
+            # Union all training batches
+            train_df = train_dfs[0]
+            for df in train_dfs[1:]:
+                train_df = train_df.union(df)
+            
+            logger.info(f"   • Processed all {len(X_train):,} training samples")
+            
+            logger.info(f"   • Processing test data in batches of {batch_size}...")
+            test_dfs = []
+            for i in range(0, len(X_test), batch_size):
+                end_idx = i + batch_size if i + batch_size < len(X_test) else len(X_test)
+                batch_rows = []
+                
+                for j in range(i, end_idx):
+                    features_vector = Vectors.dense(X_test[j].astype(float))
+                    batch_rows.append((features_vector, float(y_test[j])))
+                
+                batch_df = self.spark.createDataFrame(batch_rows, schema)
+                test_dfs.append(batch_df)
+            
+            # Union all test batches
+            test_df = test_dfs[0]
+            for df in test_dfs[1:]:
+                test_df = test_df.union(df)
+            
+            logger.info(f"   • Processed all {len(X_test):,} test samples")
+            
+            # Cache for performance - do this after processing is complete
+            logger.info("   • Caching DataFrames for performance...")
+            train_df.cache()
+            test_df.cache()
+            
+            # Force computation to ensure caching works
+            train_count = train_df.count()
+            test_count = test_df.count()
+            
+            logger.info("✓ NumPy data converted to Spark DataFrames with vector features")
+            logger.info(f"  • Training DataFrame: {train_count:,} rows")
+            logger.info(f"  • Test DataFrame: {test_count:,} rows")
+            
+            return train_df, test_df
+            
+        except Exception as e:
+            logger.error(f"✗ Error loading NumPy data: {str(e)}")
             raise
     
     def setup_models(self) -> Dict[str, Any]:
