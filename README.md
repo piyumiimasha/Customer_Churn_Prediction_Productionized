@@ -6,14 +6,18 @@ A **production-ready machine learning system** for customer churn prediction wit
 
 ### Initial Steps To Run 
 1. **Create Python UV environment**
+    ```bash
     - uv venv
     - uv --version to check version
+    ```
 
 2. **Activate the environment**
     - copy paste the output comes with Activate with:
 
 3. **install requirements**
+    ```bash
     - uv pip install -r requirements.txt
+    ```
 
 4. **Choose Your Pipeline** (run separately)
 
