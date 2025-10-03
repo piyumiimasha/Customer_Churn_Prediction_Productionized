@@ -1,4 +1,4 @@
-.PHONY: all clean install train-pipeline data-pipeline streaming-inference run-all help
+.PHONY: all clean install train-pipeline data-pipeline streaming-inference run-all spark-pipeline spark-data spark-train test-spark help
 
 # Default Python interpreter
 PYTHON = python
@@ -15,6 +15,10 @@ help:
 	@echo "  make train-pipeline      - Run the training pipeline"
 	@echo "  make streaming-inference - Run the streaming inference pipeline with the sample JSON"
 	@echo "  make run-all             - Run all pipelines in sequence"
+	@echo "  make spark-pipeline      - Run the unified Spark pipeline (distributed processing)"
+	@echo "  make spark-data          - Run Spark data processing pipeline only"
+	@echo "  make spark-train         - Run Spark model training pipeline only"
+	@echo "  make test-spark          - Test Spark pipeline setup and functionality"
 	@echo "  make clean               - Clean up artifacts"
 
 # Install project dependencies and set up environment
@@ -72,6 +76,46 @@ run-all:
 	@source $(VENV) && $(PYTHON) pipelines/streaming_inference_pipeline.py
 	@echo "\n========================================"
 	@echo "All pipelines completed successfully!"
+	@echo "========================================"
+
+# Run unified Spark pipeline (distributed processing)
+spark-pipeline:
+	@echo "Running unified Spark pipeline for distributed processing..."
+	@echo "========================================"
+	@echo "🚀 SPARK DISTRIBUTED PROCESSING PIPELINE"
+	@echo "========================================"
+	@echo "This will run both data processing and model training using Spark"
+	@echo "Check Spark UI at http://localhost:4040 during execution"
+	@source $(VENV) && $(PYTHON) pipelines/unified_spark_pipeline.py
+	@echo "✅ Spark pipeline completed successfully!"
+
+# Run Spark data processing pipeline only
+spark-data:
+	@echo "Running Spark data processing pipeline..."
+	@echo "========================================"
+	@echo "📊 SPARK DATA PROCESSING"
+	@echo "========================================"
+	@source $(VENV) && $(PYTHON) src/spark_data_pipeline.py
+	@echo "✅ Spark data processing completed!"
+
+# Run Spark model training pipeline only
+spark-train:
+	@echo "Running Spark model training pipeline..."
+	@echo "========================================"
+	@echo "🤖 SPARK MODEL TRAINING"
+	@echo "========================================"
+	@echo "Note: This requires processed data from spark-data pipeline"
+	@source $(VENV) && $(PYTHON) src/spark_model_trainer.py
+	@echo "✅ Spark model training completed!"
+
+# Test Spark pipeline setup and functionality
+test-spark:
+	@echo "Testing Spark pipeline setup..."
+	@echo "========================================"
+	@echo "🧪 SPARK PIPELINE TESTS"
+	@echo "========================================"
+	@echo "This will validate Spark imports, session creation, and basic functionality"
+	@source $(VENV) && $(PYTHON) tests/test_spark_pipeline.py
 	@echo "========================================"
 
 

@@ -173,6 +173,25 @@ def get_mlflow_config() -> Dict[str, Any]:
     """
     return config.get('mlflow', {})
 
+def get_spark_config() -> Dict[str, Any]:
+    """
+    Get Spark configuration
+    
+    Returns:
+        Dictionary with Spark configuration
+    """
+    return config.get('spark', {
+        'app_name': 'ChurnPredictionPipeline',
+        'master': 'local[*]',
+        'config_options': {
+            'spark.sql.adaptive.enabled': 'true',
+            'spark.sql.adaptive.coalescePartitions.enabled': 'true',
+            'spark.sql.execution.arrow.pyspark.enabled': 'true',
+            'spark.serializer': 'org.apache.spark.serializer.KryoSerializer',
+            'spark.sql.shuffle.partitions': '200'
+        }
+    })
+
 # Example usage:
 if __name__ == "__main__":
     # Load configuration

@@ -204,3 +204,43 @@ mlflow:
     team: "data_science"
     environment: "development"
     version: "1.0.0"
+
+# Spark Configuration for Distributed Processing
+spark:
+  app_name: "ChurnPredictionPipeline"
+  master: "local[*]"  # Use all available cores locally
+  config_options:
+    # Adaptive Query Execution
+    "spark.sql.adaptive.enabled": "true"
+    "spark.sql.adaptive.coalescePartitions.enabled": "true"
+    "spark.sql.adaptive.skewJoin.enabled": "true"
+    "spark.sql.adaptive.localShuffleReader.enabled": "true"
+    
+    # Arrow optimization for better pandas/spark interoperability
+    "spark.sql.execution.arrow.pyspark.enabled": "true"
+    "spark.sql.execution.arrow.pyspark.fallback.enabled": "true"
+    "spark.sql.execution.arrow.maxRecordsPerBatch": "10000"
+    
+    # ML and performance optimizations
+    "spark.ml.tuning.parallelism": "4"
+    "spark.sql.autoBroadcastJoinThreshold": "10485760"  # 10MB
+    
+    # Serialization and shuffle
+    "spark.serializer": "org.apache.spark.serializer.KryoSerializer"
+    "spark.sql.shuffle.partitions": "200"
+    "spark.sql.parquet.compression.codec": "snappy"
+    "spark.sql.parquet.filterPushdown": "true"
+    "spark.sql.csv.parser.columnPruning.enabled": "true"
+    
+    # Memory management
+    "spark.executor.memoryFraction": "0.8"
+    "spark.storage.memoryFraction": "0.3"
+    
+  # Distributed cluster configuration (for production)
+  cluster_config:
+    master: "spark://master:7077"  # Update for actual cluster
+    executor_memory: "4g"
+    executor_cores: "2"
+    num_executors: "4"
+    driver_memory: "2g"
+    driver_cores: "2"
