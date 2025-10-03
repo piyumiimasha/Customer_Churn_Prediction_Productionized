@@ -1,42 +1,18 @@
 
-# 🎯 Customer Churn Prediction - Productionized
+#  Customer Churn Prediction - Productionized
 
 A **production-ready machine learning system** for customer churn prediction with both **traditional pandas** and **distributed Spark** processing pipelines.
 
-## 🌟 Key Features
 
-### 📊 **Dual Processing Pipelines**
-- **🐼 Pandas Pipeline**: Traditional single-machine processing for datasets < 10GB
-- **⚡ Spark Pipeline**: Distributed processing for large-scale data and cluster deployment
-
-### 🤖 **Machine Learning Capabilities** 
-- **Pandas**: Scikit-learn algorithms (CatBoost, RandomForest, LogisticRegression)
-- **Spark**: MLlib algorithms (GBT, RandomForest, LogisticRegression) with distributed training
-
-### 📈 **MLflow Integration**
-- Comprehensive experiment tracking and model versioning
-- Automated visualization generation (ROC curves, confusion matrices)
-- Model registry with staging/production workflows
-- Performance monitoring and comparison tools
-
-### 🔧 **Production Features**
-- Intelligent data format detection (CSV, Excel, Parquet)
-- Distributed feature engineering matching pandas implementation
-- Cross-validation with hyperparameter tuning
-- Performance benchmarking and optimization
-- Scalable deployment options (local → cluster → cloud)
-
----
-
-### Steps To Run 
-1. Create Python UV environment
+### Initial Steps To Run 
+1. **Create Python UV environment**
     - uv venv
     - uv --version to check version
 
-2. Activate the environment
+2. **Activate the environment**
     - copy paste the output comes with Activate with:
 
-3. install requirements
+3. **install requirements**
     - uv pip install -r requirements.txt
 
 4. **Choose Your Pipeline** (run separately)
@@ -61,13 +37,13 @@ A **production-ready machine learning system** for customer churn prediction wit
     - **mlflow_utils.py** - Comprehensive MLflow integration utilities for experiment tracking, model versioning, and performance monitoring
 
 2. **MLflow Utilities Features**
-    - 🎯 **Experiment Management**: Automatic experiment creation and run tracking
-    - 📊 **Data Pipeline Metrics**: Logs dataset info, missing values, outliers, feature counts
-    - 🤖 **Model Tracking**: Hyperparameters, training metrics, model artifacts
-    - 📈 **Visualization**: Auto-generated plots (confusion matrix, ROC curves, feature importance)
-    - 🏷️ **Model Registry**: Model versioning and stage transitions (staging, production)
-    - 📋 **Comprehensive Evaluation**: Precision, recall, F1-score, AUC metrics
-    - 🔍 **Inference Tracking**: Prediction distribution and performance monitoring
+    -  **Experiment Management**: Automatic experiment creation and run tracking
+    -  **Data Pipeline Metrics**: Logs dataset info, missing values, outliers, feature counts
+    -  **Model Tracking**: Hyperparameters, training metrics, model artifacts
+    -  **Visualization**: Auto-generated plots (confusion matrix, ROC curves, feature importance)
+    -  **Model Registry**: Model versioning and stage transitions (staging, production)
+    -  **Comprehensive Evaluation**: Precision, recall, F1-score, AUC metrics
+    -  **Inference Tracking**: Prediction distribution and performance monitoring
 
 3. **MLflow Setup**
     - MLflow is already installed with requirements
@@ -130,13 +106,13 @@ python pipelines/spark_model_trainer.py      # Model training only
 - **`src/spark_utils.py`** - Spark utility functions
 
 #### 3. **Spark Features & Capabilities**
-- ⚡ **Distributed Processing**: Automatic data partitioning and parallel execution
-- 🔧 **MLlib Integration**: Native Spark ML algorithms (LogisticRegression, RandomForest, GBT)
-- 📊 **Performance Optimization**: Adaptive Query Execution, Arrow support, Kryo serialization
-- 🎯 **Feature Engineering**: Distributed feature creation matching pandas implementation
-- 📈 **Scalability**: Handles datasets from MBs to TBs
-- 🔍 **Cross-Validation**: Distributed hyperparameter tuning
-- 💾 **Data Formats**: Support for Parquet, CSV, JSON with intelligent format detection
+-  **Distributed Processing**: Automatic data partitioning and parallel execution
+-  **MLlib Integration**: Native Spark ML algorithms (LogisticRegression, RandomForest, GBT)
+-  **Performance Optimization**: Adaptive Query Execution, Arrow support, Kryo serialization
+-  **Feature Engineering**: Distributed feature creation matching pandas implementation
+-  **Scalability**: Handles datasets from MBs to TBs
+-  **Cross-Validation**: Distributed hyperparameter tuning
+-  **Data Formats**: Support for Parquet, CSV, JSON with intelligent format detection
 
 
 
