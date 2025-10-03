@@ -79,13 +79,14 @@ class SparkModelTrainer:
             config_options=config_options
         )
     
-    def load_processed_data(self, train_path: str, test_path: str) -> Tuple[DataFrame, DataFrame]:
+    def load_processed_data(self, train_path: str, test_path: str, format: str = "auto") -> Tuple[DataFrame, DataFrame]:
         """
-        Load processed training and test data
+        Load processed training and test data from various formats
         
         Args:
             train_path: Path to training data
             test_path: Path to test data
+            format: Data format ("parquet", "csv", or "auto" for automatic detection)
             
         Returns:
             Tuple[DataFrame, DataFrame]: Train and test DataFrames
@@ -93,8 +94,38 @@ class SparkModelTrainer:
         try:
             logger.info("📖 Loading processed data...")
             
-            train_df = self.spark.read.parquet(train_path)
-            test_df = self.spark.read.parquet(test_path)
+            # Auto-detect format if needed
+            if format == "auto":
+                if train_path.endswith(".parquet") or "/train_data.parquet" in train_path:
+                    format = "parquet"
+                elif train_path.endswith("_csv") or "csv" in train_path:
+                    format = "csv"
+                else:
+                    # Try parquet first, fall back to CSV
+                    format = "parquet"
+            
+            try:
+                if format == "parquet":
+                    logger.info("   • Loading from Parquet format")
+                    train_df = self.spark.read.parquet(train_path)
+                    test_df = self.spark.read.parquet(test_path)
+                else:
+                    logger.info("   • Loading from CSV format") 
+                    train_df = self.spark.read.option("header", "true").option("inferSchema", "true").csv(train_path)
+                    test_df = self.spark.read.option("header", "true").option("inferSchema", "true").csv(test_path)
+                    
+                    # Note: CSV format loses vector structure, would need reconstruction for MLlib
+                    logger.warning("⚠️  CSV format detected - features column needs vector reconstruction for MLlib")
+                    
+            except Exception as parquet_error:
+                if format == "parquet":
+                    logger.warning(f"⚠️  Parquet loading failed: {str(parquet_error)}")
+                    logger.info("   • Trying CSV format as fallback...")
+                    train_df = self.spark.read.option("header", "true").option("inferSchema", "true").csv(train_path)
+                    test_df = self.spark.read.option("header", "true").option("inferSchema", "true").csv(test_path)
+                    logger.warning("⚠️  Using CSV fallback - features column needs vector reconstruction")
+                else:
+                    raise
             
             # Cache for better performance
             train_df.cache()
@@ -106,6 +137,7 @@ class SparkModelTrainer:
             logger.info(f"✓ Data loaded successfully")
             logger.info(f"  • Training: {train_count:,} samples")
             logger.info(f"  • Test: {test_count:,} samples")
+            logger.info(f"  • Columns: {len(train_df.columns)}")
             
             return train_df, test_df
             
@@ -606,22 +638,60 @@ class SparkModelTrainer:
 
 
 def main():
-    """Main function to run the Spark model training pipeline"""
+    """Main function to run the Spark model training pipeline with distributed processing"""
     try:
         # Initialize trainer
         trainer = SparkModelTrainer()
         
-        # Run pipeline
-        train_path = "artifacts/spark_data/train_data.parquet"
-        test_path = "artifacts/spark_data/test_data.parquet"
-        results = trainer.run_complete_training_pipeline(train_path, test_path)
+        # Try different data formats (Parquet first, CSV fallback for Windows compatibility)
+        data_paths = [
+            ("artifacts/spark_data/train_data.parquet", "artifacts/spark_data/test_data.parquet"),
+            ("artifacts/spark_data/train_data_csv", "artifacts/spark_data/test_data_csv")
+        ]
         
-        print(f"\n🎉 Training pipeline completed successfully!")
-        print(f"Models trained: {len(results['models_trained'])}")
-        print(f"Best model: {results['best_model_path']}")
+        results = None
+        for train_path, test_path in data_paths:
+            try:
+                logger.info(f"🔍 Attempting to load data from: {train_path}")
+                
+                if "csv" in train_path:
+                    logger.warning("⚠️  Note: CSV format requires vector reconstruction for full MLlib training")
+                    logger.info("   • This demo will show capabilities but may need feature engineering")
+                    logger.info("   • For production use, save data in Parquet format with proper vectors")
+                
+                results = trainer.run_complete_training_pipeline(train_path, test_path)
+                break
+                
+            except Exception as e:
+                logger.warning(f"⚠️  Failed to load from {train_path}: {str(e)}")
+                if train_path == data_paths[-1][0]:  # Last attempt
+                    raise
+                continue
+        
+        if results:
+            print(f"\n🎉 Distributed MLlib Training Pipeline Completed!")
+            print(f"✅ Models trained: {len(results['models_trained'])}")
+            print(f"🏆 Best model saved: {results['best_model_path']}")
+            print(f"📊 Comparison results: {results['comparison_results']}")
+            
+            print(f"\n🌟 Distributed Processing Features Used:")
+            print(f"  • Spark MLlib algorithms for scalable training")
+            print(f"  • Distributed cross-validation with parallel execution")
+            print(f"  • Automatic hyperparameter tuning across cluster")
+            print(f"  • Memory-efficient data caching and partitioning")
+            print(f"  • Fault-tolerant training with checkpoint recovery")
+            print(f"  • MLflow integration for experiment tracking")
+        else:
+            logger.error("❌ No data found - run data pipeline first:")
+            logger.info("   python pipelines/spark_data_pipeline.py")
         
     except Exception as e:
         logger.error(f"Training pipeline execution failed: {str(e)}")
+        logger.info("\n💡 Troubleshooting:")
+        logger.info("  1. Ensure data pipeline has been run first")
+        logger.info("  2. Check that artifacts/spark_data/ directory exists")
+        logger.info("  3. For Windows: CSV format is used due to Hadoop compatibility")
+        logger.info("  4. For full MLlib training: use Parquet format with proper vector features")
         raise
     finally:
         # Stop Spark session
