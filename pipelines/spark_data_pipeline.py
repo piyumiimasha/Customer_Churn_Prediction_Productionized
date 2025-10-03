@@ -672,18 +672,21 @@ class SparkDataPipeline:
             # 8. Save processed data
             logger.info("💾 Saving processed data...")
             
-            # Note: Parquet saving disabled due to Windows Hadoop compatibility issues
-            # To enable, install winutils.exe or use a different file format
-            logger.info("⚠️ Parquet saving skipped due to Windows Hadoop compatibility")
-            logger.info("   Data is processed and ready in memory for further use")
+            # Save as CSV format (Windows-compatible alternative to Parquet)
+            logger.info("💾 Saving train data as CSV...")
+            train_df.select("features", "label").coalesce(1).write.mode("overwrite").option("header", "true").csv(
+                f"{output_dir}/train_data_csv"
+            )
             
-            # Save as Parquet for better performance (commented out for Windows compatibility)
-            # train_df.select("features", "label").write.mode("overwrite").parquet(
-            #     f"{output_dir}/train_data.parquet"
-            # )
-            # test_df.select("features", "label").write.mode("overwrite").parquet(
-            #     f"{output_dir}/test_data.parquet"
-            # )
+            logger.info("💾 Saving test data as CSV...")
+            test_df.select("features", "label").coalesce(1).write.mode("overwrite").option("header", "true").csv(
+                f"{output_dir}/test_data_csv"
+            )
+            
+            logger.info("✅ Data saved successfully in CSV format")
+            
+            # Note: Parquet format disabled due to Windows Hadoop compatibility issues
+            # To enable Parquet: install winutils.exe and set HADOOP_HOME
             
             # Save pipeline model (commented out for Windows compatibility)
             # fitted_pipeline.write().overwrite().save(f"{output_dir}/preprocessing_pipeline")
