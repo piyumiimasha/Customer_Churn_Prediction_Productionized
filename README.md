@@ -9,38 +9,6 @@ A **production-ready machine learning system** for customer churn prediction wit
 ![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.x-red)
 ![Production Ready](https://img.shields.io/badge/Production-Ready-brightgreen)
 
-### 🎯 **Key Features**
-- ✅ **Complete MLOps Pipeline** with automated workflow orchestration
-- ✅ **Dual Processing Engines** (Pandas + Spark) for any data size
-- ✅ **Advanced Hyperparameter Tuning** with distributed cross-validation
-- ✅ **Real-time Monitoring** with MLflow experiment tracking
-- ✅ **Production-Ready Scheduling** with Apache Airflow DAGs
-- ✅ **Enterprise-Grade Features** (error handling, logging, validation)
-- ✅ **One-Command Deployment** with automated service management
-
-## 📋 Table of Contents
-
-- [🚀 Quick Start](#initial-steps-to-run)
-- [📊 MLflow Interface](#mlflow-interface)
-- [⚡ Spark Distributed Processing](#spark-distributed-processing)
-- [🚀 Apache Airflow Orchestration](#-apache-airflow-orchestration)
-  - [DAGs Overview](#-airflow-dags-overview)
-  - [Setup & Installation](#️-airflow-setup--installation)
-  - [Enterprise Features](#-airflow-features-implemented)
-  - [Workflow Automation](#-workflow-automation-benefits)
-- [📁 Project Structure](#-project-structure-with-airflow)
-- [🏆 Complete MLOps Solution](#-complete-mlops-solution)
-
-## 🛠️ Technologies Stack
-
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **Orchestration** | Apache Airflow | Workflow automation & scheduling |
-| **Experiment Tracking** | MLflow | Model lifecycle management |
-| **Data Processing** | Pandas + PySpark | Single-machine & distributed processing |
-| **Machine Learning** | Scikit-learn + Spark MLlib | Traditional & distributed ML |
-| **Model Training** | CatBoost + RandomForest + GBT | Advanced ensemble methods |
-| **Infrastructure** | Docker + Local deployment | Containerized & local execution |
 
 ## 🚀 Quick Start
 
