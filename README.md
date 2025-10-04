@@ -251,12 +251,12 @@ airflow triggerer
 - **Username**: `admin`
 - **Password**: `admin`
 
-### 3. **Airflow Task Implementation**
+#### 3. **Airflow Task Implementation**
 
 All Airflow tasks are implemented in `utils/airflow_tasks.py` with professional error handling:
 
 
-### 📁 **Project Structure **
+#### 📁 **Project Structure **
 
 ```
 ├── 🗂️ dags/                           # Airflow DAG definitions
