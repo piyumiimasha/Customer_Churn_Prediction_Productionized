@@ -1,8 +1,48 @@
 
 #  Customer Churn Prediction - Productionized
 
-A **production-ready machine learning system** for customer churn prediction with both **traditional pandas** and **distributed Spark** processing pipelines.
+A **production-ready machine learning system** for customer churn prediction with both **traditional pandas** and **distributed Spark** processing pipelines, orchestrated with **Apache Airflow**.
 
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-2.11.0-orange)
+![MLflow](https://img.shields.io/badge/MLflow-2.x-green)
+![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.x-red)
+![Production Ready](https://img.shields.io/badge/Production-Ready-brightgreen)
+
+### 🎯 **Key Features**
+- ✅ **Complete MLOps Pipeline** with automated workflow orchestration
+- ✅ **Dual Processing Engines** (Pandas + Spark) for any data size
+- ✅ **Advanced Hyperparameter Tuning** with distributed cross-validation
+- ✅ **Real-time Monitoring** with MLflow experiment tracking
+- ✅ **Production-Ready Scheduling** with Apache Airflow DAGs
+- ✅ **Enterprise-Grade Features** (error handling, logging, validation)
+- ✅ **One-Command Deployment** with automated service management
+
+## 📋 Table of Contents
+
+- [🚀 Quick Start](#initial-steps-to-run)
+- [📊 MLflow Interface](#mlflow-interface)
+- [⚡ Spark Distributed Processing](#spark-distributed-processing)
+- [🚀 Apache Airflow Orchestration](#-apache-airflow-orchestration)
+  - [DAGs Overview](#-airflow-dags-overview)
+  - [Setup & Installation](#️-airflow-setup--installation)
+  - [Enterprise Features](#-airflow-features-implemented)
+  - [Workflow Automation](#-workflow-automation-benefits)
+- [📁 Project Structure](#-project-structure-with-airflow)
+- [🏆 Complete MLOps Solution](#-complete-mlops-solution)
+
+## 🛠️ Technologies Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Orchestration** | Apache Airflow | Workflow automation & scheduling |
+| **Experiment Tracking** | MLflow | Model lifecycle management |
+| **Data Processing** | Pandas + PySpark | Single-machine & distributed processing |
+| **Machine Learning** | Scikit-learn + Spark MLlib | Traditional & distributed ML |
+| **Model Training** | CatBoost + RandomForest + GBT | Advanced ensemble methods |
+| **Infrastructure** | Docker + Local deployment | Containerized & local execution |
+
+## 🚀 Quick Start
 
 ### Initial Steps To Run 
 1. **Create Python UV environment**
@@ -32,6 +72,18 @@ A **production-ready machine learning system** for customer churn prediction wit
    python pipelines/spark_data_pipeline.py    # Data preprocessing only
    python pipelines/spark_model_trainer.py    # Model training only
    python pipelines/unified_spark_pipeline.py # Complete end-to-end (recommended)
+   ```
+
+   **🚀 Airflow Orchestration (Production)**
+   ```bash
+   # Start Airflow services
+   .\run.ps1 airflow-start
+   
+   # Access Airflow Web UI
+   # http://localhost:8080 (admin/admin)
+   
+   # Access MLflow UI  
+   # http://localhost:5000
    ```
 
 
@@ -145,3 +197,143 @@ The pipeline uses optimized Spark configurations:
 - Automatic model registry integration
 ```
 
+### Apache Airflow Orchestration
+
+#### 1. **Airflow DAGs Overview**
+
+#### **1.1 Data Pipeline DAG** (`dags/data_pipeline_dag.py`)
+- **Schedule**: Every 5 minutes (`*/5 * * * *`)
+- **Purpose**: Automated data preprocessing and feature engineering
+- **Tasks**:
+  - `validate_input_data` - Check data availability and integrity
+  - `run_data_pipeline` - Execute preprocessing, cleaning, encoding, scaling
+- **Output**: Clean, processed data ready for training
+
+#### **1.2. Training Pipeline DAG** (`dags/train_pipeline_dag.py`)
+- **Schedule**: Daily at 1:00 AM IST (`30 19 * * *`)
+- **Purpose**: Automated model training with hyperparameter tuning
+- **Tasks**:
+  - `validate_processed_data` - Ensure training data is available
+  - `run_training_pipeline` - Execute model training with optimization
+- **Features**:
+  - **Automated Hyperparameter Tuning** with CrossValidator
+  - **MLflow Integration** for experiment tracking
+  - **Model Evaluation** with comprehensive metrics
+  - **Model Registry** management
+
+#### **1.3. Inference Pipeline DAG** (`dags/inference_pipeline_dag.py`)
+- **Schedule**: Every minute (`* * * * *`)
+- **Purpose**: Automated prediction generation and monitoring
+- **Tasks**:
+  - `validate_trained_model` - Check model availability
+  - `run_inference_pipeline` - Generate predictions and store results
+- **Features**:
+  - **Real-time Predictions** with latest trained model
+  - **Result Storage** and performance monitoring
+  - **Model Validation** before inference
+
+#### 2. **Airflow Setup & Installation**
+
+#### **2.1 Install Apache Airflow**
+```bash
+# Install Airflow with all required providers
+pip install "apache-airflow[celery,redis,postgres,http,email]==2.11.0"
+```
+
+#### **2.2 Initialize Airflow Database**
+```bash
+# Initialize Airflow metadata database
+airflow db init
+
+# Create admin user
+airflow users create \
+    --username admin \
+    --firstname Admin \
+    --lastname User \
+    --role Admin \
+    --email admin@example.com \
+    --password admin
+```
+
+#### **2.3 Start Airflow Services**
+
+**Option A: Using the provided script (Recommended)**
+```bash
+# For Windows
+.\run.ps1 airflow-start
+
+# For Linux/Mac
+./run.sh airflow-start
+```
+
+**Option B: Manual startup**
+```bash
+# Terminal 1: Start webserver
+airflow webserver --port 8080
+
+# Terminal 2: Start scheduler
+airflow scheduler
+
+# Terminal 3: Start triggerer (for sensors)
+airflow triggerer
+```
+
+#### **2.4 Access Airflow Web UI**
+- **URL**: `http://localhost:8080`
+- **Username**: `admin`
+- **Password**: `admin`
+
+### 3. **Airflow Task Implementation**
+
+All Airflow tasks are implemented in `utils/airflow_tasks.py` with professional error handling:
+
+
+### 📁 **Project Structure **
+
+```
+├── 🗂️ dags/                           # Airflow DAG definitions
+│   ├── data_pipeline_dag.py          # Data preprocessing workflow
+│   ├── train_pipeline_dag.py         # Model training workflow
+│   └── inference_pipeline_dag.py     # Inference workflow
+│
+├── 🗂️ utils/                          # Airflow utilities
+│   ├── airflow_tasks.py              # Professional task wrappers
+│   ├── config.py                     # Configuration management
+│   └── mlflow_utils.py               # MLflow integration
+│
+├── 🗂️ pipelines/                      # Core ML pipelines
+│   ├── data_pipeline.py              # Pandas data processing
+│   ├── training_pipeline.py          # Model training pipeline
+│   ├── spark_data_pipeline.py        # Distributed data processing
+│   ├── spark_model_trainer.py        # Distributed model training
+│   ├── unified_spark_pipeline.py     # End-to-end Spark pipeline
+│   └── streaming_inference_pipeline.py # Real-time inference
+│
+├── 🗂️ src/                           # Core ML components
+│   ├── data_ingestion.py             # Data loading utilities
+│   ├── feature_engineering.py        # Feature creation
+│   ├── model_building.py             # Model architecture
+│   ├── model_training.py             # Training logic
+│   ├── model_evaluation.py           # Evaluation metrics
+│   ├── model_inference.py            # Prediction generation
+│   └── spark_*.py                    # Spark-specific implementations
+│
+├── 🗂️ artifacts/                      # Generated outputs
+│   ├── data/                         # Processed datasets
+│   ├── models/                       # Trained models
+│   ├── plots/                        # Visualizations
+│   └── evaluation/                   # Evaluation results
+│
+├── 🗂️ .airflow/                      # Airflow metadata (auto-generated)
+│   ├── airflow.cfg                   # Airflow configuration
+│   ├── airflow.db                    # SQLite database
+│   └── logs/                         # Execution logs
+│
+├── 🗂️ mlruns/                        # MLflow experiment tracking
+│   └── [experiment_folders]/         # MLflow artifacts
+│
+├── 📄 run.ps1                        # Windows Airflow launcher
+├── 📄 airflow_settings.yaml          # Airflow configuration
+├── 📄 config.yml                     # Project configuration
+└── 📄 requirements.txt               # Dependencies (includes Airflow)
+```
