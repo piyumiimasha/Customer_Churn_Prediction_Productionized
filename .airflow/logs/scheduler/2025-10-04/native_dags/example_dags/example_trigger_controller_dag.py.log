@@ -1,0 +1,20 @@
+[2025-10-04T12:10:40.276+0530] {processor.py:186} INFO - Started process (PID=33412) to work on C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_trigger_controller_dag.py
+[2025-10-04T12:10:40.276+0530] {processor.py:914} INFO - Processing file C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_trigger_controller_dag.py for tasks to queue
+[2025-10-04T12:10:40.278+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:10:40.277+0530] {dagbag.py:588} INFO - Filling up the DagBag from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_trigger_controller_dag.py
+[2025-10-04T12:10:40.307+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:10:40.305+0530] {dagbag.py:387} ERROR - Failed to import: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_trigger_controller_dag.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 383, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_trigger_controller_dag.py", line 29, in <module>
+    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\operators\trigger_dagrun.py", line 45, in <module>
+    from airflow.triggers.external_task import DagStateTrigger
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\triggers\external_task.py", line 23, in <module>
+    from asgiref.sync import sync_to_async
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\asgiref\sync.py", line 11, in <module>
+    from concurrent.futures import Future, ThreadPoolExecutor
+ImportError: cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+[2025-10-04T12:10:40.307+0530] {processor.py:927} WARNING - No viable dags retrieved from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_trigger_controller_dag.py
+[2025-10-04T12:10:41.140+0530] {processor.py:208} INFO - Processing C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_trigger_controller_dag.py took 0.870 seconds

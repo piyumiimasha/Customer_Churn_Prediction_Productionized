@@ -1,0 +1,138 @@
+[2025-10-04T12:12:19.996+0530] {processor.py:186} INFO - Started process (PID=29640) to work on C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_inlet_event_extra.py
+[2025-10-04T12:12:19.996+0530] {processor.py:914} INFO - Processing file C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_inlet_event_extra.py for tasks to queue
+[2025-10-04T12:12:19.998+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:19.998+0530] {dagbag.py:588} INFO - Filling up the DagBag from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_inlet_event_extra.py
+[2025-10-04T12:12:22.071+0530] {processor.py:925} INFO - DAG(s) 'read_dataset_event', 'read_dataset_event_from_classic' retrieved from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_inlet_event_extra.py
+[2025-10-04T12:12:22.140+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.137+0530] {dagbag.py:698} ERROR - Failed to write serialized DAG: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_inlet_event_extra.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1663, in serialize_dag
+    dag_deps = [
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1666, in <listcomp>
+    for dep in SerializedBaseOperator.detect_dependencies(task)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1468, in detect_dependencies
+    deps = set(dependency_detector.detect_task_dependencies(op))
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1026, in detect_task_dependencies
+    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\operators\trigger_dagrun.py", line 45, in <module>
+    from airflow.triggers.external_task import DagStateTrigger
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\triggers\external_task.py", line 23, in <module>
+    from asgiref.sync import sync_to_async
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\asgiref\sync.py", line 11, in <module>
+    from concurrent.futures import Future, ThreadPoolExecutor
+ImportError: cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 686, in _serialize_dag_capturing_errors
+    dag_was_updated = SerializedDagModel.write_dag(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\utils\session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 169, in write_dag
+    new_serialized_dag = cls(dag, processor_subdir)
+  File "<string>", line 4, in __init__
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 481, in _initialize_instance
+    with util.safe_reraise():
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\compat.py", line 211, in raise_
+    raise exception
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 479, in _initialize_instance
+    return manager.original_init(*mixed[1:], **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 116, in __init__
+    dag_data = SerializedDAG.to_dict(dag)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1776, in to_dict
+    json_dict = {"__version": cls.SERIALIZER_VERSION, "dag": cls.serialize_dag(var)}
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1685, in serialize_dag
+    raise SerializationError(f"Failed to serialize DAG {dag.dag_id!r}: {e}")
+airflow.exceptions.SerializationError: Failed to serialize DAG 'read_dataset_event': cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+[2025-10-04T12:12:22.147+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.146+0530] {dagbag.py:698} ERROR - Failed to write serialized DAG: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_inlet_event_extra.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1663, in serialize_dag
+    dag_deps = [
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1666, in <listcomp>
+    for dep in SerializedBaseOperator.detect_dependencies(task)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1468, in detect_dependencies
+    deps = set(dependency_detector.detect_task_dependencies(op))
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1026, in detect_task_dependencies
+    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\operators\trigger_dagrun.py", line 45, in <module>
+    from airflow.triggers.external_task import DagStateTrigger
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\triggers\external_task.py", line 23, in <module>
+    from asgiref.sync import sync_to_async
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\asgiref\sync.py", line 11, in <module>
+    from concurrent.futures import Future, ThreadPoolExecutor
+ImportError: cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 686, in _serialize_dag_capturing_errors
+    dag_was_updated = SerializedDagModel.write_dag(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\utils\session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 169, in write_dag
+    new_serialized_dag = cls(dag, processor_subdir)
+  File "<string>", line 4, in __init__
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 481, in _initialize_instance
+    with util.safe_reraise():
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\compat.py", line 211, in raise_
+    raise exception
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 479, in _initialize_instance
+    return manager.original_init(*mixed[1:], **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 116, in __init__
+    dag_data = SerializedDAG.to_dict(dag)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1776, in to_dict
+    json_dict = {"__version": cls.SERIALIZER_VERSION, "dag": cls.serialize_dag(var)}
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1685, in serialize_dag
+    raise SerializationError(f"Failed to serialize DAG {dag.dag_id!r}: {e}")
+airflow.exceptions.SerializationError: Failed to serialize DAG 'read_dataset_event_from_classic': cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+[2025-10-04T12:12:22.148+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.148+0530] {dag.py:3239} INFO - Sync 2 DAGs
+[2025-10-04T12:12:22.155+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.155+0530] {dag.py:3262} INFO - Creating ORM DAG for read_dataset_event_from_classic
+[2025-10-04T12:12:22.155+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.155+0530] {dag.py:3262} INFO - Creating ORM DAG for read_dataset_event
+[2025-10-04T12:12:22.163+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.161+0530] {dag.py:1182} ERROR - Failed to fetch run info after data interval None for DAG 'read_dataset_event'
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dag.py", line 1177, in next_dagrun_info
+    info = self.timetable.next_dagrun_info(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\timetables\interval.py", line 94, in next_dagrun_info
+    earliest = self._skip_to_latest(earliest)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\timetables\interval.py", line 166, in _skip_to_latest
+    return max(new_start, self._align_to_next(earliest))
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\timetables\_cron.py", line 137, in _align_to_next
+    next_time = self._get_next(current)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\timetables\_cron.py", line 110, in _get_next
+    scheduled = cron.get_next(datetime.datetime)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\croniter\croniter.py", line 288, in get_next
+    return self._get_next(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\croniter\croniter.py", line 415, in _get_next
+    result = self._calc(self.cur, expanded, nth_weekday_of_month, is_prev)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\croniter\croniter.py", line 510, in _calc
+    dst = now = self.timestamp_to_datetime(now + sign * offset)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\croniter\croniter.py", line 347, in timestamp_to_datetime
+    result = datetime.datetime.fromtimestamp(timestamp, tz=tzutc()).replace(tzinfo=None)
+OSError: [Errno 22] Invalid argument
+[2025-10-04T12:12:22.164+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.163+0530] {dag.py:4180} INFO - Setting next_dagrun for read_dataset_event to None, run_after=None
+[2025-10-04T12:12:22.165+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.164+0530] {dag.py:1182} ERROR - Failed to fetch run info after data interval None for DAG 'read_dataset_event_from_classic'
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dag.py", line 1177, in next_dagrun_info
+    info = self.timetable.next_dagrun_info(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\timetables\interval.py", line 94, in next_dagrun_info
+    earliest = self._skip_to_latest(earliest)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\timetables\interval.py", line 166, in _skip_to_latest
+    return max(new_start, self._align_to_next(earliest))
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\timetables\_cron.py", line 137, in _align_to_next
+    next_time = self._get_next(current)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\timetables\_cron.py", line 110, in _get_next
+    scheduled = cron.get_next(datetime.datetime)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\croniter\croniter.py", line 288, in get_next
+    return self._get_next(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\croniter\croniter.py", line 415, in _get_next
+    result = self._calc(self.cur, expanded, nth_weekday_of_month, is_prev)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\croniter\croniter.py", line 510, in _calc
+    dst = now = self.timestamp_to_datetime(now + sign * offset)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\croniter\croniter.py", line 347, in timestamp_to_datetime
+    result = datetime.datetime.fromtimestamp(timestamp, tz=tzutc()).replace(tzinfo=None)
+OSError: [Errno 22] Invalid argument
+[2025-10-04T12:12:22.165+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:12:22.165+0530] {dag.py:4180} INFO - Setting next_dagrun for read_dataset_event_from_classic to None, run_after=None
+[2025-10-04T12:12:22.818+0530] {processor.py:208} INFO - Processing C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\example_inlet_event_extra.py took 2.824 seconds

@@ -1,0 +1,42 @@
+[2025-10-04T12:06:53.649+0530] {processor.py:186} INFO - Started process (PID=35096) to work on C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:06:53.649+0530] {processor.py:914} INFO - Processing file C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py for tasks to queue
+[2025-10-04T12:06:53.651+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:06:53.651+0530] {dagbag.py:588} INFO - Filling up the DagBag from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:06:53.682+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:06:53.681+0530] {dagbag.py:387} ERROR - Failed to import: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 383, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py", line 10, in <module>
+    from utils.airflow_tasks import validate_trained_model, run_inference_pipeline
+ModuleNotFoundError: No module named 'utils'
+[2025-10-04T12:06:53.683+0530] {processor.py:927} WARNING - No viable dags retrieved from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:06:54.360+0530] {processor.py:208} INFO - Processing C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py took 0.715 seconds
+[2025-10-04T12:09:31.441+0530] {processor.py:186} INFO - Started process (PID=37708) to work on C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:09:31.441+0530] {processor.py:914} INFO - Processing file C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py for tasks to queue
+[2025-10-04T12:09:31.443+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:09:31.442+0530] {dagbag.py:588} INFO - Filling up the DagBag from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:09:31.472+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:09:31.471+0530] {dagbag.py:387} ERROR - Failed to import: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 383, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py", line 10, in <module>
+    from utils.airflow_tasks import validate_trained_model, run_inference_pipeline
+ModuleNotFoundError: No module named 'utils'
+[2025-10-04T12:09:31.473+0530] {processor.py:927} WARNING - No viable dags retrieved from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:09:32.142+0530] {processor.py:208} INFO - Processing C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py took 0.704 seconds
+[2025-10-04T12:15:07.851+0530] {processor.py:186} INFO - Started process (PID=33732) to work on C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:15:07.851+0530] {processor.py:914} INFO - Processing file C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py for tasks to queue
+[2025-10-04T12:15:07.852+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:15:07.852+0530] {dagbag.py:588} INFO - Filling up the DagBag from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:15:07.882+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:15:07.881+0530] {dagbag.py:387} ERROR - Failed to import: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 383, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py", line 10, in <module>
+    from utils.airflow_tasks import validate_trained_model, run_inference_pipeline
+ModuleNotFoundError: No module named 'utils'
+[2025-10-04T12:15:07.883+0530] {processor.py:927} WARNING - No viable dags retrieved from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py
+[2025-10-04T12:15:08.588+0530] {processor.py:208} INFO - Processing C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.airflow\dags\inference_pipeline_dag.py took 0.741 seconds

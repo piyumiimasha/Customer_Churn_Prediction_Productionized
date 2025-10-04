@@ -1,0 +1,151 @@
+[2025-10-04T12:07:32.991+0530] {processor.py:186} INFO - Started process (PID=11920) to work on C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:07:32.992+0530] {processor.py:914} INFO - Processing file C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py for tasks to queue
+[2025-10-04T12:07:32.992+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:07:32.992+0530] {dagbag.py:588} INFO - Filling up the DagBag from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:07:33.046+0530] {processor.py:925} INFO - DAG(s) 'tutorial_objectstorage' retrieved from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:07:33.123+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:07:33.120+0530] {dagbag.py:698} ERROR - Failed to write serialized DAG: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1663, in serialize_dag
+    dag_deps = [
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1666, in <listcomp>
+    for dep in SerializedBaseOperator.detect_dependencies(task)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1468, in detect_dependencies
+    deps = set(dependency_detector.detect_task_dependencies(op))
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1026, in detect_task_dependencies
+    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\operators\trigger_dagrun.py", line 45, in <module>
+    from airflow.triggers.external_task import DagStateTrigger
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\triggers\external_task.py", line 23, in <module>
+    from asgiref.sync import sync_to_async
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\asgiref\sync.py", line 11, in <module>
+    from concurrent.futures import Future, ThreadPoolExecutor
+ImportError: cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 686, in _serialize_dag_capturing_errors
+    dag_was_updated = SerializedDagModel.write_dag(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\utils\session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 169, in write_dag
+    new_serialized_dag = cls(dag, processor_subdir)
+  File "<string>", line 4, in __init__
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 481, in _initialize_instance
+    with util.safe_reraise():
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\compat.py", line 211, in raise_
+    raise exception
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 479, in _initialize_instance
+    return manager.original_init(*mixed[1:], **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 116, in __init__
+    dag_data = SerializedDAG.to_dict(dag)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1776, in to_dict
+    json_dict = {"__version": cls.SERIALIZER_VERSION, "dag": cls.serialize_dag(var)}
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1685, in serialize_dag
+    raise SerializationError(f"Failed to serialize DAG {dag.dag_id!r}: {e}")
+airflow.exceptions.SerializationError: Failed to serialize DAG 'tutorial_objectstorage': cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+[2025-10-04T12:07:33.124+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:07:33.124+0530] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-10-04T12:07:33.134+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:07:33.133+0530] {dag.py:3262} INFO - Creating ORM DAG for tutorial_objectstorage
+[2025-10-04T12:07:33.134+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:07:33.134+0530] {dag.py:4180} INFO - Setting next_dagrun for tutorial_objectstorage to None, run_after=None
+[2025-10-04T12:07:33.762+0530] {processor.py:208} INFO - Processing C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py took 0.773 seconds
+[2025-10-04T12:10:11.530+0530] {processor.py:186} INFO - Started process (PID=21660) to work on C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:10:11.531+0530] {processor.py:914} INFO - Processing file C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py for tasks to queue
+[2025-10-04T12:10:11.532+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:10:11.531+0530] {dagbag.py:588} INFO - Filling up the DagBag from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:10:11.587+0530] {processor.py:925} INFO - DAG(s) 'tutorial_objectstorage' retrieved from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:10:11.663+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:10:11.659+0530] {dagbag.py:698} ERROR - Failed to write serialized DAG: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1663, in serialize_dag
+    dag_deps = [
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1666, in <listcomp>
+    for dep in SerializedBaseOperator.detect_dependencies(task)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1468, in detect_dependencies
+    deps = set(dependency_detector.detect_task_dependencies(op))
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1026, in detect_task_dependencies
+    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\operators\trigger_dagrun.py", line 45, in <module>
+    from airflow.triggers.external_task import DagStateTrigger
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\triggers\external_task.py", line 23, in <module>
+    from asgiref.sync import sync_to_async
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\asgiref\sync.py", line 11, in <module>
+    from concurrent.futures import Future, ThreadPoolExecutor
+ImportError: cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 686, in _serialize_dag_capturing_errors
+    dag_was_updated = SerializedDagModel.write_dag(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\utils\session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 169, in write_dag
+    new_serialized_dag = cls(dag, processor_subdir)
+  File "<string>", line 4, in __init__
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 481, in _initialize_instance
+    with util.safe_reraise():
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\compat.py", line 211, in raise_
+    raise exception
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 479, in _initialize_instance
+    return manager.original_init(*mixed[1:], **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 116, in __init__
+    dag_data = SerializedDAG.to_dict(dag)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1776, in to_dict
+    json_dict = {"__version": cls.SERIALIZER_VERSION, "dag": cls.serialize_dag(var)}
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1685, in serialize_dag
+    raise SerializationError(f"Failed to serialize DAG {dag.dag_id!r}: {e}")
+airflow.exceptions.SerializationError: Failed to serialize DAG 'tutorial_objectstorage': cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+[2025-10-04T12:10:11.664+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:10:11.664+0530] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-10-04T12:10:11.672+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:10:11.672+0530] {dag.py:4180} INFO - Setting next_dagrun for tutorial_objectstorage to None, run_after=None
+[2025-10-04T12:10:12.374+0530] {processor.py:208} INFO - Processing C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py took 0.846 seconds
+[2025-10-04T12:15:45.368+0530] {processor.py:186} INFO - Started process (PID=25432) to work on C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:15:45.369+0530] {processor.py:914} INFO - Processing file C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py for tasks to queue
+[2025-10-04T12:15:45.370+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:15:45.369+0530] {dagbag.py:588} INFO - Filling up the DagBag from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:15:45.425+0530] {processor.py:925} INFO - DAG(s) 'tutorial_objectstorage' retrieved from C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+[2025-10-04T12:15:45.501+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:15:45.498+0530] {dagbag.py:698} ERROR - Failed to write serialized DAG: C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1663, in serialize_dag
+    dag_deps = [
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1666, in <listcomp>
+    for dep in SerializedBaseOperator.detect_dependencies(task)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1468, in detect_dependencies
+    deps = set(dependency_detector.detect_task_dependencies(op))
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1026, in detect_task_dependencies
+    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\operators\trigger_dagrun.py", line 45, in <module>
+    from airflow.triggers.external_task import DagStateTrigger
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\triggers\external_task.py", line 23, in <module>
+    from asgiref.sync import sync_to_async
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\asgiref\sync.py", line 11, in <module>
+    from concurrent.futures import Future, ThreadPoolExecutor
+ImportError: cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\dagbag.py", line 686, in _serialize_dag_capturing_errors
+    dag_was_updated = SerializedDagModel.write_dag(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\utils\session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 169, in write_dag
+    new_serialized_dag = cls(dag, processor_subdir)
+  File "<string>", line 4, in __init__
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 481, in _initialize_instance
+    with util.safe_reraise():
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\util\compat.py", line 211, in raise_
+    raise exception
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\sqlalchemy\orm\state.py", line 479, in _initialize_instance
+    return manager.original_init(*mixed[1:], **kwargs)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\models\serialized_dag.py", line 116, in __init__
+    dag_data = SerializedDAG.to_dict(dag)
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1776, in to_dict
+    json_dict = {"__version": cls.SERIALIZER_VERSION, "dag": cls.serialize_dag(var)}
+  File "C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\serialization\serialized_objects.py", line 1685, in serialize_dag
+    raise SerializationError(f"Failed to serialize DAG {dag.dag_id!r}: {e}")
+airflow.exceptions.SerializationError: Failed to serialize DAG 'tutorial_objectstorage': cannot import name 'ThreadPoolExecutor' from 'concurrent.futures' (C:\Users\viraj\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\__init__.py)
+[2025-10-04T12:15:45.502+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:15:45.501+0530] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-10-04T12:15:45.513+0530] {logging_mixin.py:190} INFO - [2025-10-04T12:15:45.513+0530] {dag.py:4180} INFO - Setting next_dagrun for tutorial_objectstorage to None, run_after=None
+[2025-10-04T12:15:46.175+0530] {processor.py:208} INFO - Processing C:\Users\viraj\Zuu\Customer_Churn_Prediction_Productionized\.venv\lib\site-packages\airflow\example_dags\tutorial_objectstorage.py took 0.811 seconds
