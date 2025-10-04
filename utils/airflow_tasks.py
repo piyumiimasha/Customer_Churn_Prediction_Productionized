@@ -57,7 +57,7 @@ def validate_input_data(data_path: str = 'data/hmQOVnDvRN.xls') -> Dict[str, Any
         'message': 'Input data file exists and has content'
     }
 
-def validate_processed_data(data_path: str = 'data/processed/imputed.csv') -> Dict[str, Any]:
+def validate_processed_data(data_path: str = 'artifacts/data/X_train.csv') -> Dict[str, Any]:
     """
     Lightweight validation that processed data exists.
     
@@ -207,9 +207,7 @@ def setup_project_environment() -> str:
     return str(project_root)
 
 def run_data_pipeline(
-                    data_path: str = 'data/raw/ChurnModelling.csv',
-                    force_rebuild: bool = False,
-                    output_format: str = 'both'
+                    force_rebuild: bool = False
                     ) -> Dict[str, Any]:
     """
     Professional wrapper for data pipeline execution.
@@ -229,15 +227,11 @@ def run_data_pipeline(
         os.chdir(project_root)
         
         # Import and execute pipeline
-        from data_pipeline import data_pipeline
+        from pipelines.data_pipeline import data_pipeline
         
-        logger.info(f"Starting data pipeline: {data_path}")
+        logger.info("Starting data pipeline")
         
-        result = data_pipeline(
-                            data_path=data_path,
-                            force_rebuild=force_rebuild,
-                            output_format=output_format
-                            )
+        result = data_pipeline(force_rebuild=force_rebuild)
         
         logger.info("✓ Data pipeline completed successfully")
         
@@ -256,13 +250,11 @@ def run_data_pipeline(
         raise
 
 def run_training_pipeline(
-    data_path: str = 'data/raw/ChurnModelling.csv',
+    data_path: str = 'data/hmQOVnDvRN.xls',
     model_params: Optional[Dict[str, Any]] = None,
     test_size: float = 0.2,
     random_state: int = 42,
-    model_path: str = 'artifacts/models/airflow_spark_random_forest_model',
-    data_format: str = 'csv',
-    training_engine: str = 'pyspark'
+    model_path: str = 'artifacts/models/telco_analysis.joblib'
 ) -> Dict[str, Any]:
     """
     Professional wrapper for training pipeline execution.
@@ -293,19 +285,17 @@ def run_training_pipeline(
                 'seed': 42
             }
         
-        # Import and execute pipeline
-        from training_pipeline import training_pipeline
+        # Import and execute pipeline  
+        from pipelines.training_pipeline import training_pipeline
         
-        logger.info(f"Starting training pipeline: {training_engine}")
+        logger.info("Starting training pipeline")
         
         result = training_pipeline(
             data_path=data_path,
             model_params=model_params,
             test_size=test_size,
             random_state=random_state,
-            model_path=model_path,
-            data_format=data_format,
-            training_engine=training_engine
+            model_path=model_path
         )
         
         logger.info("✓ Training pipeline completed successfully")
@@ -314,7 +304,6 @@ def run_training_pipeline(
         return {
             'status': 'success',
             'model_path': model_path,
-            'training_engine': training_engine,
             'metrics': result if isinstance(result, dict) else {'message': str(result)},
             'message': 'Training pipeline completed successfully'
         }
@@ -363,28 +352,34 @@ def run_inference_pipeline(
         # Use default sample data if not provided
         if sample_data is None:
             sample_data = {
-                        'CreditScore': 650,
-                        'Geography': 'Spain',
-                        'Gender': 'Male',
-                        'Age': 35,
-                        'Tenure': 5,
-                        'Balance': 50000.0,
-                        'NumOfProducts': 2,
-                        'HasCrCard': 1,
-                        'IsActiveMember': 1,
-                        'EstimatedSalary': 60000.0
+                        "MonthlyCharges": 85.5,
+                        "TotalCharges": "2560.1",  # String format as in original data
+                        "Contract": "Month-to-month",
+                        "InternetService": "Fiber optic", 
+                        "PaymentMethod": "Electronic check",
+                        "tenure": 30,
+                        "gender": "Male",
+                        "SeniorCitizen": 0,
+                        "Partner": "Yes",
+                        "Dependents": "No",
+                        "PhoneService": "Yes",
+                        "MultipleLines": "No",
+                        "OnlineSecurity": "No",
+                        "OnlineBackup": "Yes", 
+                        "DeviceProtection": "No",
+                        "TechSupport": "No",
+                        "StreamingTV": "No",
+                        "StreamingMovies": "Yes"
                         }
         
         # Import and execute pipeline
-        from streaming_inference_pipeline import initialize_inference_system, streaming_inference
+        from pipelines.streaming_inference_pipeline import streaming_inference
+        from src.model_inference import ModelInference
         
         logger.info(f"Starting inference pipeline: {model_path}")
         
         # Initialize inference system
-        inference = initialize_inference_system(
-            model_path=model_path,
-            encoders_path=encoders_path
-        )
+        inference = ModelInference(model_path)
         
         # Run inference
         result = streaming_inference(inference, sample_data)

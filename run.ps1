@@ -39,12 +39,13 @@ Available targets:
   .\run.ps1 spark-train         - Run Spark model training pipeline only
   .\run.ps1 test-spark          - Test Spark pipeline setup and functionality
   .\run.ps1 clean               - Clean up artifacts
-  .\run.ps1 airflow-init        - Initialize Apache Airflow
-  .\run.ps1 airflow-start       - Start Airflow in standalone mode
-  .\run.ps1 airflow-webserver   - Start Airflow webserver
-  .\run.ps1 airflow-scheduler   - Start Airflow scheduler
-  .\run.ps1 airflow-kill        - Kill all running Airflow processes
-  .\run.ps1 airflow-reset       - Reset Airflow database and fix login issues
+  .\run.ps1 airflow-init            - Initialize Apache Airflow
+  .\run.ps1 airflow-start           - Start Airflow in standalone mode
+  .\run.ps1 airflow-webserver-only  - Start Airflow webserver only (Windows compatible)
+  .\run.ps1 airflow-webserver       - Start Airflow webserver
+  .\run.ps1 airflow-scheduler       - Start Airflow scheduler
+  .\run.ps1 airflow-kill            - Kill all running Airflow processes
+  .\run.ps1 airflow-reset           - Reset Airflow database and fix login issues
 "@ -ForegroundColor Green
     }
 
@@ -198,6 +199,30 @@ Available targets:
         }
         
         Invoke-InVenv "airflow standalone"
+    }
+
+    "airflow-webserver-only" {
+        Write-Host "Starting Airflow webserver only (Windows compatible)..." -ForegroundColor Green
+        Write-Host "Webserver will be available at http://localhost:8080" -ForegroundColor Cyan
+        Write-Host "Login with: admin / admin" -ForegroundColor Cyan
+        Write-Host "Note: Scheduler disabled due to Windows compatibility" -ForegroundColor Yellow
+        
+        $env:AIRFLOW_HOME = "$(Get-Location)\.airflow"
+        $env:PYTHONWARNINGS = "ignore::DeprecationWarning"
+        
+        # Copy DAGs
+        $dagsDir = "$env:AIRFLOW_HOME\dags"
+        if (Test-Path "dags") {
+            if (-not (Test-Path $dagsDir)) {
+                New-Item -ItemType Directory -Path $dagsDir -Force | Out-Null
+            }
+            Copy-Item "dags\*.py" $dagsDir -Force -ErrorAction SilentlyContinue
+            Write-Host "DAGs copied to: $dagsDir" -ForegroundColor Green
+        }
+        
+        # Start only webserver (no scheduler/triggerer)
+        Write-Host "Starting webserver..." -ForegroundColor Yellow
+        Invoke-InVenv "airflow webserver --port 8080"
     }
 
     "airflow-kill" {
