@@ -76,3 +76,8 @@ groq>=0.11.0
 # libgomp1 (for OpenMP support)
 # libblas-dev
 # liblapack-dev 
+
+# Apache Airflow for Pipeline Orchestration
+# Note: Airflow 3.0 is available but may need additional setup
+apache-airflow>=2.10.0,<3.0.0
+apache-airflow-providers-apache-spark>=4.0.0
