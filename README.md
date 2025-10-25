@@ -9,9 +9,6 @@ A **production-ready machine learning system** for customer churn prediction wit
 ![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.x-red)
 ![Production Ready](https://img.shields.io/badge/Production-Ready-brightgreen)
 
-
-## 🚀 Quick Start
-
 ### Initial Steps To Run 
 1. **Create Python UV environment**
     ```bash
@@ -251,12 +248,12 @@ airflow triggerer
 - **Username**: `admin`
 - **Password**: `admin`
 
-### 3. **Airflow Task Implementation**
+#### 3. **Airflow Task Implementation**
 
 All Airflow tasks are implemented in `utils/airflow_tasks.py` with professional error handling:
 
 
-### 📁 **Project Structure **
+#### 📁 **Project Structure**
 
 ```
 ├── 🗂️ dags/                           # Airflow DAG definitions
