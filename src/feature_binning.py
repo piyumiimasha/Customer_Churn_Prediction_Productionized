@@ -47,6 +47,10 @@ class TenureBinningStrategy(FeatureBinningStrategy):
         except Exception as e:
             logging.error(f"Error during {column} binning: {str(e)}")
             raise
+    
+    def transform(self, df: pd.DataFrame, column: str = 'tenure') -> pd.DataFrame:
+        """Alias for bin_feature to maintain compatibility with other strategies"""
+        return self.bin_feature(df, column)
 
 class SpendBinningStrategy(FeatureBinningStrategy):
     def __init__(self, bins: List[float], labels: List[str]):
@@ -84,6 +88,10 @@ class SpendBinningStrategy(FeatureBinningStrategy):
         except Exception as e:
             logging.error(f"Error during {column} binning: {str(e)}")
             raise
+    
+    def transform(self, df: pd.DataFrame, column: str) -> pd.DataFrame:
+        """Alias for bin_feature to maintain compatibility with other strategies"""
+        return self.bin_feature(df, column)
 
 class FeatureBinningHandler:
     def __init__(self, strategies: Optional[Dict[str, FeatureBinningStrategy]] = None):

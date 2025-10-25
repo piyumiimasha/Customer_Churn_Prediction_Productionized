@@ -40,6 +40,10 @@ class ServicesScoreStrategy(FeatureEngineeringStrategy):
         except Exception as e:
             logging.error(f"Error calculating services score: {str(e)}")
             raise
+    
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Alias for engineer_feature to maintain compatibility"""
+        return self.engineer_feature(df)
 
 class VulnerabilityScoreStrategy(FeatureEngineeringStrategy):
     
@@ -91,6 +95,10 @@ class VulnerabilityScoreStrategy(FeatureEngineeringStrategy):
         except Exception as e:
             logging.error(f"Error calculating vulnerability score: {str(e)}")
             raise
+    
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Alias for engineer_feature to maintain compatibility"""
+        return self.engineer_feature(df)
 
 class FeatureEngineeringHandler:
     def __init__(self, strategies: Optional[List[FeatureEngineeringStrategy]] = None):

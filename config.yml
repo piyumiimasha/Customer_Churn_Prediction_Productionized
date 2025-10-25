@@ -244,3 +244,46 @@ spark:
     num_executors: "4"
     driver_memory: "2g"
     driver_cores: "2"
+
+# Kafka Configuration for Real-time Processing
+kafka:
+  broker_config:
+    bootstrap_servers: "localhost:9092"
+    client_id: "telco_churn_pipeline"
+    api_version: "auto"
+    security_protocol: "PLAINTEXT"
+    
+  topics:
+    raw_customers: "telco.raw.customers"
+    churn_predictions: "telco.churn.predictions"
+    dead_letter: "telco.deadletter"
+    
+  producer_config:
+    key_serializer: "org.apache.kafka.common.serialization.StringSerializer"
+    value_serializer: "org.apache.kafka.common.serialization.StringSerializer"
+    acks: "all"
+    retries: 3
+    batch_size: 16384
+    linger_ms: 10
+    buffer_memory: 33554432
+    compression_type: "gzip"
+    
+  consumer_config:
+    key_deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
+    value_deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
+    group_id: "churn_prediction_consumers"
+    auto_offset_reset: "earliest"
+    enable_auto_commit: False
+    max_poll_records: 500
+    session_timeout_ms: 30000
+    heartbeat_interval_ms: 3000
+    
+  streaming:
+    events_per_second: 10
+    poll_timeout_ms: 1000
+    max_poll_interval_ms: 300000
+    
+  batch:
+    batch_size: 1000
+    checkpoint_dir: "checkpoints/"
+    resume_from_checkpoint: True
